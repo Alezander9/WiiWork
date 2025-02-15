@@ -1,3 +1,25 @@
+/* First, define the font faces */
+@font-face {
+  font-family: "Continuum";
+  src: url("/fonts/contm.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Continuum";
+  src: url("/fonts/contl.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Continuum";
+  src: url("/fonts/contb.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -43,6 +65,8 @@
     --chart-4: 43 74% 66%;
 
     --chart-5: 27 87% 67%;
+
+    --font-sans: "Continuum", system-ui, sans-serif;
   }
 
   .dark {
@@ -79,6 +103,19 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
+
+  html {
+    font-family: var(--font-sans);
+  }
+
+  /* Adjust letter spacing for different weights */
+  .font-normal {
+    letter-spacing: 0.08em;
+  }
+
+  .font-bold {
+    letter-spacing: 0.04em;
+  }
 }
 
 @layer base {
@@ -86,6 +123,6 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-wii-bg-light text-foreground min-h-screen;
   }
 }
