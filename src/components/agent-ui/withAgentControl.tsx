@@ -1,4 +1,4 @@
-import { useEffect, useRef, ComponentType } from "react";
+import { useEffect, useRef, ComponentType, PropsWithChildren } from "react";
 import { useAgentStore } from "@/stores/agentStore";
 
 // Props that our HOC will inject
@@ -13,7 +13,7 @@ interface AgentControlProps {
   onUniversalClick?: () => void;
 }
 
-export function withAgentControl<T extends AgentProps>(
+export function withAgentControl<T extends AgentProps & PropsWithChildren>(
   WrappedComponent: ComponentType<T>
 ) {
   // Create a nice display name for dev tools
@@ -21,7 +21,8 @@ export function withAgentControl<T extends AgentProps>(
     WrappedComponent.displayName || WrappedComponent.name || "Component";
 
   function ComponentWithAgent(
-    props: Omit<T, keyof AgentProps> & AgentControlProps
+    props: Omit<T, keyof AgentProps> &
+      AgentControlProps & { [key: string]: any }
   ) {
     const { controlId, onUniversalClick, ...componentProps } = props;
     const elementRef = useRef<HTMLDivElement>(null);

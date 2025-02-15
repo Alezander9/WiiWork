@@ -34,6 +34,12 @@ interface AgentStore {
   updatePosition: (id: string) => void;
   triggerInteraction: (id: string, type: "click" | "hover") => void;
   getComponentPosition: (id: string) => ComponentPosition | null;
+  cursor: {
+    visible: boolean;
+    position: { x: number; y: number };
+  };
+  setCursorVisible: (visible: boolean) => void;
+  setCursorPosition: (position: { x: number; y: number }) => void;
 }
 
 export const useAgentStore = create<AgentStore>((set, get) => ({
@@ -110,5 +116,28 @@ export const useAgentStore = create<AgentStore>((set, get) => ({
   getComponentPosition: (id) => {
     const component = get().components[id];
     return component?.position || null;
+  },
+
+  cursor: {
+    visible: false,
+    position: { x: 0, y: 0 },
+  },
+
+  setCursorVisible: (visible) => {
+    set((state) => ({
+      cursor: {
+        ...state.cursor,
+        visible,
+      },
+    }));
+  },
+
+  setCursorPosition: (position) => {
+    set((state) => ({
+      cursor: {
+        ...state.cursor,
+        position,
+      },
+    }));
   },
 }));
