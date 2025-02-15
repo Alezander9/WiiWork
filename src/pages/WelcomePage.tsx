@@ -1,7 +1,5 @@
 import { AgentButton, AgentIconButton } from "@/components/agent-ui";
-import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { useAgentStore } from "@/stores/agentStore";
 import { Settings } from "lucide-react";
 import { AgentContext } from "@/components/agent-ui/AgentContext";
 
@@ -58,33 +56,6 @@ export default function WelcomePage() {
           >
             Admin Panel
           </AgentButton>
-
-          {/* Dev Controls - styled distinctly */}
-          <div className="mt-12 p-4 border-2 border-red-500 rounded-lg">
-            <p className="text-red-500 font-bold mb-2">Dev Controls</p>
-            <div className="flex gap-2 flex-wrap">
-              <Button
-                onClick={() => {
-                  useAgentStore
-                    .getState()
-                    .triggerInteraction("reading-list-button", "hover");
-                }}
-                className="bg-red-200 hover:bg-red-300 text-red-700"
-              >
-                Hover Reading List
-              </Button>
-              <Button
-                onClick={() => {
-                  useAgentStore
-                    .getState()
-                    .triggerInteraction("reading-list-button", "click");
-                }}
-                className="bg-red-200 hover:bg-red-300 text-red-700"
-              >
-                Click Reading List
-              </Button>
-            </div>
-          </div>
         </div>
       </div>
     </>

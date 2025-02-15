@@ -4,6 +4,32 @@ import { api } from "../../../convex/_generated/api";
 import { useAgentStore } from "@/stores/agentStore";
 import { Message } from "@/llm/types";
 
+const TOOL_CALL_REGEX = /\[\[(\w+):([^\]]+)\]\]/g;
+
+// System prompt combining role, context format, and tool instructions
+const SYSTEM_PROMPT = `You are a helpful AI assistant that controls a virtual cursor and can interact with UI elements on a webpage. You help users navigate and interact with the interface.
+
+Input Format:
+You will receive:
+1. Page Context: Information about the current page and its purpose
+2. Available Elements: A list of interactive elements on the page, their locations, and what they do
+3. User Request: What the user wants you to help with
+
+Available Tools:
+- [[click:ELEMENT_ID]] : Clicks an element. The cursor will automatically move to the element and click after a brief pause.
+- [[hover:ELEMENT_ID]] : Moves the cursor over an element without clicking.
+
+Example Tool Usage:
+"I'll help you navigate to the reading list.
+[[click:reading-list-button]]"
+
+Guidelines:
+1. Always explain what you're doing before using a tool
+2. Use the context provided to understand what elements do
+3. Only use tools on elements that are listed as available
+4. Respond conversationally while executing actions
+5. Keep responses concise and avoid unnecessary technical details`;
+
 // Move selectors outside component to prevent recreation
 const selectCursor = (state: any) => state.cursor;
 const selectComponents = (state: any) => state.components;
@@ -68,33 +94,6 @@ function formatPageState(cursor: any, components: Record<string, any>) {
 
   return output;
 }
-
-const TOOL_CALL_REGEX = /\[\[(\w+):([^\]]+)\]\]/g;
-
-// System prompt combining role, context format, and tool instructions
-const SYSTEM_PROMPT = `You are a helpful AI assistant that controls a virtual cursor and can interact with UI elements on a webpage. You help users navigate and interact with the interface.
-
-Input Format:
-You will receive:
-1. Page Context: Information about the current page and its purpose
-2. Available Elements: A list of interactive elements on the page, their locations, and what they do
-3. User Request: What the user wants you to help with
-
-Available Tools:
-- [[click:ELEMENT_ID]] : Clicks an element. The cursor will automatically move to the element and click after a brief pause.
-- [[hover:ELEMENT_ID]] : Moves the cursor over an element without clicking.
-
-Example Tool Usage:
-"I'll help you navigate to the reading list.
-[[click:reading-list-button]]
-I've clicked the reading list button, which will take you to the reading list page."
-
-Guidelines:
-1. Always explain what you're doing before using a tool
-2. Confirm actions after they're completed
-3. Use the context provided to understand what elements do
-4. Only use tools on elements that are listed as available
-5. Respond conversationally while executing actions`;
 
 interface ParsedToolCall {
   action: string;
@@ -175,7 +174,7 @@ async function executeToolCall(toolCall: ParsedToolCall) {
       useAgentStore.getState().triggerInteraction(target, "hover");
 
       // Wait for hover effect
-      await sleep(300);
+      await sleep(500);
 
       // Click
       useAgentStore.getState().triggerInteraction(target, "click");
@@ -192,8 +191,6 @@ async function executeToolCall(toolCall: ParsedToolCall) {
       // Wait for movement
       await sleep(500);
 
-      // Hover
-      useAgentStore.getState().triggerInteraction(target, "hover");
       break;
     }
 
@@ -235,7 +232,7 @@ export function AgentBrain() {
     try {
       const response = await generateCompletion({
         messages,
-        modelName: "gpt-4",
+        modelName: "gpt-4o-mini",
         temperature: 0.7,
       });
 
@@ -262,25 +259,34 @@ export function AgentBrain() {
         { role: "user", content: formattedInput },
       ]);
 
-      // Parse tool calls
-      const toolCalls = parseToolCalls(response);
+      // First, update the UI with the response
+      addAssistantMessage(response);
 
-      // Execute tool calls in sequence
-      for (const toolCall of toolCalls) {
+      // Then start tool execution in a separate async operation
+      setTimeout(async () => {
         try {
-          await executeToolCall(toolCall);
-        } catch (error) {
-          if ((error as ToolCallError).type === "INVALID_TOOL") {
-            console.error(`Invalid tool call: ${toolCall.fullMatch}`);
-            // TODO: Better error handling
-          } else if ((error as ToolCallError).type === "INVALID_TARGET") {
-            console.error(`Invalid target in tool call: ${toolCall.fullMatch}`);
-            // TODO: Better error handling
-          } else {
-            throw error;
+          const toolCalls = parseToolCalls(response);
+          await sleep(500); // Give user time to start reading
+
+          for (const toolCall of toolCalls) {
+            try {
+              await executeToolCall(toolCall);
+            } catch (error) {
+              if ((error as ToolCallError).type === "INVALID_TOOL") {
+                console.error(`Invalid tool call: ${toolCall.fullMatch}`);
+              } else if ((error as ToolCallError).type === "INVALID_TARGET") {
+                console.error(
+                  `Invalid target in tool call: ${toolCall.fullMatch}`
+                );
+              } else {
+                throw error;
+              }
+            }
           }
+        } catch (error) {
+          console.error("Error executing tool calls:", error);
         }
-      }
+      }, 0);
 
       return response;
     } catch (error) {
