@@ -21,7 +21,7 @@ export function AgentCursor({ position = { x: 0, y: 0 } }: AgentCursorProps) {
     <div
       className="fixed pointer-events-none z-50 transition-transform duration-300 ease-out"
       style={{
-        transform: `translate(${cursorPos.x}px, ${cursorPos.y}px)`,
+        transform: `translate(${cursorPos.x - 18}px, ${cursorPos.y}px)`,
       }}
     >
       <img

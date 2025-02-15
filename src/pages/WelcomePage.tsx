@@ -17,7 +17,7 @@ export default function WelcomePage() {
 
       <div className="container mx-auto py-8 space-y-8">
         {/* Add settings button */}
-        <div className="absolute top-4 left-4">
+        <div className="absolute top-4 right-4">
           <AgentIconButton
             controlId="settings-button"
             onUniversalClick={() => {

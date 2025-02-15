@@ -38,7 +38,7 @@ export const internalGenerateCompletion = internalAction({
     maxTokens: v.optional(v.number()),
     temperature: v.optional(v.number()),
   },
-  handler: async (ctx, args) => {
+  handler: async (_ctx, args) => {
     try {
       // Determine provider from model name
       let provider: LLMProvider = "openai";
@@ -102,7 +102,7 @@ export const internalGenerateStream = internalAction({
     maxTokens: v.optional(v.number()),
     temperature: v.optional(v.number()),
   },
-  handler: async (ctx, args) => {
+  handler: async (_ctx, args) => {
     try {
       // Determine provider from model name
       let provider: LLMProvider = "openai";
