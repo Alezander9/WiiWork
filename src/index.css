@@ -1,23 +1,35 @@
 /* First, define the font faces */
 @font-face {
   font-family: "Continuum";
-  src: url("/fonts/contm.ttf") format("truetype");
+  src:
+    url("/fonts/ContinuumMedium.woff2") format("woff2"),
+    url("/fonts/ContinuumMedium.woff") format("woff"),
+    url("/fonts/contm.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
   font-family: "Continuum";
-  src: url("/fonts/contl.ttf") format("truetype");
+  src:
+    url("/fonts/ContinuumLight.woff2") format("woff2"),
+    url("/fonts/ContinuumLight.woff") format("woff"),
+    url("/fonts/contl.ttf") format("truetype");
   font-weight: 300;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
   font-family: "Continuum";
-  src: url("/fonts/contb.ttf") format("truetype");
+  src:
+    url("/fonts/ContinuumBold.woff2") format("woff2"),
+    url("/fonts/ContinuumBold.woff") format("woff"),
+    url("/fonts/contb.ttf") format("truetype");
   font-weight: 700;
   font-style: normal;
+  font-display: swap;
 }
 
 @tailwind base;
@@ -123,6 +135,6 @@
     @apply border-border;
   }
   body {
-    @apply bg-wii-bg-light text-foreground min-h-screen;
+    @apply bg-background text-foreground;
   }
 }
