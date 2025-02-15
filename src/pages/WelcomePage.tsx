@@ -2,48 +2,18 @@ import { AgentButton, AgentIconButton } from "@/components/agent-ui";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAgentStore } from "@/stores/agentStore";
-import { AgentCursor } from "@/components/agent/AgentCursor";
 import { Settings } from "lucide-react";
-import { useAction } from "convex/react";
-import { api } from "../../convex/_generated/api";
+import { AgentContext } from "@/components/agent-ui/AgentContext";
 
 export default function WelcomePage() {
   const navigate = useNavigate();
-  const generateCompletion = useAction(api.llm.generateCompletion);
-
-  // Hooks must be top level
-  const cursorVisible = useAgentStore((state) => state.cursor.visible);
-  const cursorPosition = useAgentStore((state) => state.cursor.position);
-
-  const testLLM = async () => {
-    try {
-      const response = await generateCompletion({
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are a professional French pastry chef with decades of experience.",
-          },
-          {
-            role: "user",
-            content:
-              "What ingredients do I need to make a classic crème brûlée?",
-          },
-        ],
-        modelName: "gpt-4",
-        temperature: 0.7,
-      });
-
-      console.log("Chef's Response:", response.content);
-    } catch (error) {
-      console.error("Error testing LLM:", error);
-    }
-  };
 
   return (
     <>
-      {/* Cursor outside the spaced container */}
-      {cursorVisible && <AgentCursor position={cursorPosition} />}
+      <AgentContext
+        controlId="page-context"
+        context="This is the main welcome page. From here, users can access their reading list or the admin panel. The reading list contains saved articles, while the admin panel provides system management options."
+      />
 
       <div className="container mx-auto py-8 space-y-8">
         {/* Add settings button */}
@@ -53,6 +23,7 @@ export default function WelcomePage() {
             onUniversalClick={() => {
               console.log("Settings clicked!");
             }}
+            context="This button opens the settings menu"
             className="bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white"
           >
             <Settings className="w-6 h-6" />
@@ -70,6 +41,7 @@ export default function WelcomePage() {
               console.log("Reading List clicked!");
               navigate("/reading-list");
             }}
+            context="This button navigates to the reading list page where you can view saved articles"
             className="w-64 bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white font-normal"
           >
             Reading List
@@ -81,6 +53,7 @@ export default function WelcomePage() {
               console.log("Admin clicked!");
               navigate("/admin");
             }}
+            context="This button navigates to the admin panel where you can manage system settings"
             className="w-64 bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white font-normal"
           >
             Admin Panel
@@ -109,60 +82,6 @@ export default function WelcomePage() {
                 className="bg-red-200 hover:bg-red-300 text-red-700"
               >
                 Click Reading List
-              </Button>
-              <Button
-                onClick={() => {
-                  const position = useAgentStore
-                    .getState()
-                    .getComponentPosition("reading-list-button");
-                  console.log("Reading List Button Position:", position);
-                }}
-                className="bg-red-200 hover:bg-red-300 text-red-700"
-              >
-                Log Position
-              </Button>
-              <Button
-                onClick={() => {
-                  useAgentStore
-                    .getState()
-                    .setCursorVisible(!useAgentStore.getState().cursor.visible);
-                }}
-                className="bg-red-200 hover:bg-red-300 text-red-700"
-              >
-                Toggle Cursor
-              </Button>
-              <Button
-                onClick={() => {
-                  const position = useAgentStore
-                    .getState()
-                    .getComponentPosition("reading-list-button");
-                  if (position) {
-                    useAgentStore.getState().setCursorPosition({
-                      x: position.x,
-                      y: position.y,
-                    });
-                  }
-                }}
-                className="bg-red-200 hover:bg-red-300 text-red-700"
-              >
-                Move to Reading List
-              </Button>
-              <Button
-                onClick={() => {
-                  useAgentStore.getState().setCursorPosition({
-                    x: window.innerWidth - 50,
-                    y: window.innerHeight - 50,
-                  });
-                }}
-                className="bg-red-200 hover:bg-red-300 text-red-700"
-              >
-                Move to Corner
-              </Button>
-              <Button
-                onClick={testLLM}
-                className="bg-red-200 hover:bg-red-300 text-red-700"
-              >
-                Test GPT-4 Chef
               </Button>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { AgentButton } from "@/components/agent-ui/AgentButton";
 import { useNavigate } from "react-router-dom";
 
 export default function ReadingListPage() {
@@ -8,12 +8,14 @@ export default function ReadingListPage() {
     <div className="container mx-auto py-8 space-y-8">
       <div className="flex justify-between items-center">
         <h1 className="text-4xl font-bold text-wii-blue">Reading List</h1>
-        <Button
+        <AgentButton
+          controlId="back-button"
+          onUniversalClick={() => navigate("/")}
+          context="This button navigates back to the home page"
           className="bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white font-normal"
-          onClick={() => navigate("/")}
         >
           Back
-        </Button>
+        </AgentButton>
       </div>
 
       <section className="bg-white p-6 rounded-xl shadow-md">

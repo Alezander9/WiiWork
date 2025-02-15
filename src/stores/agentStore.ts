@@ -19,6 +19,7 @@ interface ComponentData {
     click?: () => void;
   };
   ref: React.RefObject<HTMLElement>;
+  context?: string;
 }
 
 interface AgentStore {
@@ -28,7 +29,8 @@ interface AgentStore {
   registerComponent: (
     id: string,
     ref: React.RefObject<HTMLElement>,
-    handlers: { click?: () => void }
+    handlers: { click?: () => void },
+    context?: string
   ) => void;
   unregisterComponent: (id: string) => void;
   updatePosition: (id: string) => void;
@@ -45,7 +47,7 @@ interface AgentStore {
 export const useAgentStore = create<AgentStore>((set, get) => ({
   components: {},
 
-  registerComponent: (id, ref, handlers) => {
+  registerComponent: (id, ref, handlers, context?) => {
     set((state) => ({
       components: {
         ...state.components,
@@ -54,6 +56,7 @@ export const useAgentStore = create<AgentStore>((set, get) => ({
           position: null,
           handlers,
           ref,
+          context,
         },
       },
     }));
@@ -96,21 +99,19 @@ export const useAgentStore = create<AgentStore>((set, get) => ({
       component.handlers.click();
     }
     // Update component state
-    set((state) => {
-      return {
-        components: {
-          ...state.components,
-          [id]: {
-            ...state.components[id],
-            state: {
-              ...state.components[id].state,
-              isPressed: type === "click",
-              isHovered: type === "hover",
-            },
+    set((state) => ({
+      components: {
+        ...state.components,
+        [id]: {
+          ...state.components[id],
+          state: {
+            ...state.components[id].state,
+            isPressed: type === "click",
+            isHovered: type === "hover",
           },
         },
-      };
-    });
+      },
+    }));
   },
 
   getComponentPosition: (id) => {
@@ -119,7 +120,7 @@ export const useAgentStore = create<AgentStore>((set, get) => ({
   },
 
   cursor: {
-    visible: false,
+    visible: true,
     position: { x: 0, y: 0 },
   },
 
