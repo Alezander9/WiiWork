@@ -4,13 +4,41 @@ import { useNavigate } from "react-router-dom";
 import { useAgentStore } from "@/stores/agentStore";
 import { AgentCursor } from "@/components/agent/AgentCursor";
 import { Settings } from "lucide-react";
+import { useAction } from "convex/react";
+import { api } from "../../convex/_generated/api";
 
 export default function WelcomePage() {
   const navigate = useNavigate();
+  const generateCompletion = useAction(api.llm.generateCompletion);
 
-  // Move hooks to top level
+  // Hooks must be top level
   const cursorVisible = useAgentStore((state) => state.cursor.visible);
   const cursorPosition = useAgentStore((state) => state.cursor.position);
+
+  const testLLM = async () => {
+    try {
+      const response = await generateCompletion({
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a professional French pastry chef with decades of experience.",
+          },
+          {
+            role: "user",
+            content:
+              "What ingredients do I need to make a classic crème brûlée?",
+          },
+        ],
+        modelName: "gpt-4",
+        temperature: 0.7,
+      });
+
+      console.log("Chef's Response:", response.content);
+    } catch (error) {
+      console.error("Error testing LLM:", error);
+    }
+  };
 
   return (
     <>
@@ -129,6 +157,12 @@ export default function WelcomePage() {
                 className="bg-red-200 hover:bg-red-300 text-red-700"
               >
                 Move to Corner
+              </Button>
+              <Button
+                onClick={testLLM}
+                className="bg-red-200 hover:bg-red-300 text-red-700"
+              >
+                Test GPT-4 Chef
               </Button>
             </div>
           </div>
