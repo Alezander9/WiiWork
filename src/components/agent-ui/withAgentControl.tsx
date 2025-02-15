@@ -23,6 +23,11 @@ export function withAgentControl<T extends AgentControlProps>(
     const { controlId, onUniversalClick, context, ...rest } = props;
     const elementRef = useRef<HTMLElement>(null);
 
+    // Add state subscription
+    const componentState = useAgentStore(
+      (state) => state.components[controlId]?.state
+    );
+
     // Add click handler
     const handleClick = () => {
       useAgentStore.getState().triggerInteraction(controlId, "click");
@@ -53,6 +58,7 @@ export function withAgentControl<T extends AgentControlProps>(
       <WrappedComponent
         ref={elementRef}
         onClick={handleClick}
+        data-hovered={componentState?.isHovered}
         {...(rest as unknown as PropsWithChildren<T>)}
       />
     );

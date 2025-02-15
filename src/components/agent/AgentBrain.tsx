@@ -128,6 +128,83 @@ ${userMessage}
 Please help the user by explaining what you'll do and using the available tools.`;
 }
 
+// Add these types
+interface ToolCallError extends Error {
+  type: "INVALID_TOOL" | "INVALID_TARGET";
+}
+
+// Add sleep utility
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Add tool execution functions
+async function executeToolCall(toolCall: ParsedToolCall) {
+  const { action, target } = toolCall;
+
+  // Verify target exists
+  const targetComponent = useAgentStore.getState().components[target];
+  if (!targetComponent) {
+    const error = new Error(
+      `Target element "${target}" not found`
+    ) as ToolCallError;
+    error.type = "INVALID_TARGET";
+    throw error;
+  }
+
+  // Get target position
+  const position = targetComponent.position;
+  if (!position) {
+    const error = new Error(
+      `Position for "${target}" not available`
+    ) as ToolCallError;
+    error.type = "INVALID_TARGET";
+    throw error;
+  }
+
+  switch (action) {
+    case "click": {
+      // Move cursor
+      useAgentStore.getState().setCursorPosition({
+        x: position.x,
+        y: position.y,
+      });
+
+      // Wait for movement
+      await sleep(500);
+
+      // Hover
+      useAgentStore.getState().triggerInteraction(target, "hover");
+
+      // Wait for hover effect
+      await sleep(300);
+
+      // Click
+      useAgentStore.getState().triggerInteraction(target, "click");
+      break;
+    }
+
+    case "hover": {
+      // Move cursor
+      useAgentStore.getState().setCursorPosition({
+        x: position.x,
+        y: position.y,
+      });
+
+      // Wait for movement
+      await sleep(500);
+
+      // Hover
+      useAgentStore.getState().triggerInteraction(target, "hover");
+      break;
+    }
+
+    default: {
+      const error = new Error(`Invalid tool "${action}"`) as ToolCallError;
+      error.type = "INVALID_TOOL";
+      throw error;
+    }
+  }
+}
+
 export function AgentBrain() {
   const generateCompletion = useAction(api.llm.generateCompletion);
 
@@ -142,17 +219,6 @@ export function AgentBrain() {
   // Get the current page state from zustand using separate selectors
   const cursor = useAgentStore(selectCursor);
   const components = useAgentStore(selectComponents);
-
-  // Combine state updates into a single useEffect
-  useEffect(() => {
-    console.log("Raw Page State:", { cursor, components });
-    const formattedState = formatPageState(cursor, components);
-    console.log("Formatted Page State:\n", formattedState);
-  }, [cursor, components]);
-
-  useEffect(() => {
-    console.log("Chat History Updated:", chatHistory);
-  }, [chatHistory]);
 
   // Method to add a user message
   const addUserMessage = (content: string) => {
@@ -182,8 +248,8 @@ export function AgentBrain() {
     }
   };
 
-  // Method to handle user requests
-  const handleUserRequest = async (userMessage: string) => {
+  // Add tool execution to handleUserRequest
+  async function handleUserRequest(userMessage: string) {
     const pageState = formatPageState(cursor, components);
     const formattedInput = createAgentInput(userMessage, pageState);
 
@@ -196,16 +262,32 @@ export function AgentBrain() {
         { role: "user", content: formattedInput },
       ]);
 
-      // Parse and execute tool calls (we'll implement this next)
+      // Parse tool calls
       const toolCalls = parseToolCalls(response);
-      console.log("Parsed tool calls:", toolCalls);
+
+      // Execute tool calls in sequence
+      for (const toolCall of toolCalls) {
+        try {
+          await executeToolCall(toolCall);
+        } catch (error) {
+          if ((error as ToolCallError).type === "INVALID_TOOL") {
+            console.error(`Invalid tool call: ${toolCall.fullMatch}`);
+            // TODO: Better error handling
+          } else if ((error as ToolCallError).type === "INVALID_TARGET") {
+            console.error(`Invalid target in tool call: ${toolCall.fullMatch}`);
+            // TODO: Better error handling
+          } else {
+            throw error;
+          }
+        }
+      }
 
       return response;
     } catch (error) {
       console.error("Error handling user request:", error);
       throw error;
     }
-  };
+  }
 
   // Update debug methods
   useEffect(() => {

@@ -98,20 +98,24 @@ export const useAgentStore = create<AgentStore>((set, get) => ({
     if (type === "click" && component?.handlers.click) {
       component.handlers.click();
     }
+
     // Update component state
-    set((state) => ({
-      components: {
-        ...state.components,
-        [id]: {
-          ...state.components[id],
-          state: {
-            ...state.components[id].state,
-            isPressed: type === "click",
-            isHovered: type === "hover",
+    set((state) => {
+      const newState = {
+        components: {
+          ...state.components,
+          [id]: {
+            ...state.components[id],
+            state: {
+              ...state.components[id].state,
+              isPressed: type === "click",
+              isHovered: type === "hover",
+            },
           },
         },
-      },
-    }));
+      };
+      return newState;
+    });
   },
 
   getComponentPosition: (id) => {
