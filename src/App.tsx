@@ -70,9 +70,10 @@ export default function App() {
                 id="audio-debug"
                 controlId="audio-debug-toggle"
                 checked={useSettingsStore((state) => state.showAudioDebugLogs)}
-                onCheckedChange={useSettingsStore(
-                  (state) => state.toggleAudioDebugLogs
-                )}
+                onUniversalClick={() => {
+                  const store = useSettingsStore.getState();
+                  store.toggleAudioDebugLogs();
+                }}
                 context="This toggle shows or hides the audio debug logs in the mobile input screen"
               />
             </div>
