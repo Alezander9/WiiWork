@@ -12,6 +12,7 @@ import { AgentLabel } from "@/components/agent-ui/AgentLabel";
 import { AgentButton } from "@/components/agent-ui/AgentButton";
 import { BreadcrumbNav } from "@/components/navigation/BreadcrumbNav";
 import { useAgentStore } from "@/stores/agentStore";
+import { playButtonSound } from "@/lib/sounds";
 
 export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -26,7 +27,10 @@ export default function App() {
       >
         <AgentIconButton
           controlId="settings-button"
-          onUniversalClick={() => setSettingsOpen(true)}
+          onUniversalClick={() => {
+            playButtonSound.settingsOpen();
+            setSettingsOpen(true);
+          }}
           context="This button opens the settings menu"
           className="bg-gray-100 hover:bg-gray-200 text-black border-2 border-blue-200 shadow-sm rounded-xl"
         >
@@ -45,7 +49,10 @@ export default function App() {
             <h2 className="text-2xl font-bold text-wii-blue">Settings</h2>
             <AgentIconButton
               controlId="close-settings-button"
-              onUniversalClick={() => setSettingsOpen(false)}
+              onUniversalClick={() => {
+                playButtonSound.settingsClose();
+                setSettingsOpen(false);
+              }}
               context="This button closes the settings menu"
               className="bg-gray-100 hover:bg-gray-200 text-black border-2 border-blue-200 shadow-sm rounded-xl"
             >

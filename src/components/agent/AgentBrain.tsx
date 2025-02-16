@@ -3,6 +3,7 @@ import { useAction } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { useAgentStore } from "@/stores/agentStore";
 import { Message } from "@/llm/types";
+import { playButtonSound } from "@/lib/sounds";
 
 const TOOL_CALL_REGEX = /\[\[(\w+):([^\]]+)\]\]/g;
 
@@ -50,7 +51,7 @@ Guidelines:
 2. Use the context provided to understand what elements do
 3. Only use tools on elements that are listed as available
 4. Respond conversationally while executing actions
-5. Keep responses concise and avoid unnecessary technical details
+5. Keep responses concise and avoid unnecessary technical details like element positions
 6. Do not say "lets do this or lets go" or anything like that, just do the action`;
 
 // First add these new system prompts at the top with the others
@@ -86,6 +87,18 @@ Remember: Accuracy is more important than speed. If you're not completely sure a
 // Move selectors outside component to prevent recreation
 const selectCursor = (state: any) => state.cursor;
 const selectComponents = (state: any) => state.components;
+
+// Add these types at the top with other interfaces
+interface ComponentData {
+  position?: { x: number; y: number };
+  context?: string;
+  handlers: {
+    input?: (value: string) => void;
+  };
+  onUniversalClick?: () => void;
+  onUniversalHover?: () => void;
+  onUniversalInput?: (value: string) => void;
+}
 
 // Helper function to format page state into natural language
 function formatPageState(cursor: any, components: Record<string, any>) {
@@ -251,7 +264,9 @@ async function executeToolCall(toolCall: ParsedToolCall) {
   const { action, target } = toolCall;
 
   // Verify target exists
-  const targetComponent = useAgentStore.getState().components[target];
+  const targetComponent = useAgentStore.getState().components[
+    target
+  ] as ComponentData;
   if (!targetComponent) {
     const error = new Error(
       `Target element "${target}" not found`
@@ -289,6 +304,18 @@ async function executeToolCall(toolCall: ParsedToolCall) {
 
       // Click
       useAgentStore.getState().triggerInteraction(target, "click");
+
+      // Special case for settings buttons
+      if (target === "settings-button") {
+        playButtonSound.settingsOpen();
+      } else if (target === "close-settings-button") {
+        playButtonSound.settingsClose();
+      } else {
+        playButtonSound.click();
+      }
+
+      // Execute click
+      targetComponent.onUniversalClick?.();
       break;
     }
 
@@ -302,6 +329,12 @@ async function executeToolCall(toolCall: ParsedToolCall) {
       // Wait for movement
       await sleep(500);
 
+      // Trigger hover interaction
+      useAgentStore.getState().triggerInteraction(target, "hover");
+
+      // Play hover sound
+      playButtonSound.hover();
+
       break;
     }
 
@@ -309,6 +342,9 @@ async function executeToolCall(toolCall: ParsedToolCall) {
       const component = useAgentStore.getState().components[target];
       if (component?.handlers.input && toolCall.params) {
         component.handlers.input(toolCall.params);
+
+        // Play type sound
+        playButtonSound.type();
       }
       break;
     }

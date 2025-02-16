@@ -3,6 +3,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { forwardRef } from "react";
+import { playButtonSound } from "@/lib/sounds";
 
 const buttonVariants = cva(
   // Base styles that apply to all variants
@@ -58,21 +59,28 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     // Compute hover classes first
     const hoverClasses = {
-      // Added ! to make these styles important
       "!bg-wii-blue !text-white":
         hovered && className?.includes("hover:bg-wii-blue"),
       "!bg-wii-gray !text-white":
         hovered && className?.includes("hover:bg-wii-gray"),
     };
 
+    // Combine click handlers
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+      playButtonSound.click();
+      props.onClick?.(e);
+    };
+
     return (
       <Comp
         className={cn(
           buttonVariants({ variant, size }),
-          className, // Base classes
-          hoverClasses // Hover classes last to take precedence
+          className,
+          hoverClasses
         )}
         ref={ref}
+        onMouseEnter={() => playButtonSound.hover()}
+        onClick={handleClick}
         {...props}
       />
     );
