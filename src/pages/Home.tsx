@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Settings } from "lucide-react";
 import { AgentContext } from "@/components/agent-ui/AgentContext";
 
-export default function WelcomePage() {
+export default function HomePage() {
   const navigate = useNavigate();
 
   return (
