@@ -53,7 +53,7 @@ export default function AdminPage() {
               <div className="flex flex-col items-center">
                 <QRCodeSVG
                   value={mobileInputUrl}
-                  size={300}
+                  size={200}
                   level="H"
                   className="bg-white rounded-lg p-2"
                 />
