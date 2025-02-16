@@ -54,11 +54,13 @@ export default function MobileInput() {
       addDebugMessage("Microphone access granted");
 
       // Check supported MIME types for this browser
-      const mimeType = MediaRecorder.isTypeSupported("audio/wav")
-        ? "audio/wav"
-        : MediaRecorder.isTypeSupported("audio/mp4")
-          ? "audio/mp4"
-          : "audio/webm"; // Fallback
+      const mimeType = MediaRecorder.isTypeSupported("audio/mpeg")
+        ? "audio/mpeg"
+        : MediaRecorder.isTypeSupported("audio/mp3")
+          ? "audio/mp3"
+          : MediaRecorder.isTypeSupported("audio/mp4")
+            ? "audio/mp4"
+            : "audio/webm"; // Last resort fallback
 
       addDebugMessage(`Using MIME type: ${mimeType}`);
 
@@ -80,7 +82,9 @@ export default function MobileInput() {
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data);
-          addDebugMessage(`Received audio chunk: ${event.data.size} bytes`);
+          addDebugMessage(
+            `Chunk received: ${event.data.size} bytes, type: ${event.data.type}`
+          );
         }
       };
 
@@ -90,7 +94,7 @@ export default function MobileInput() {
           type: mimeType,
         });
         addDebugMessage(
-          `Final blob type: ${audioBlob.type}, size: ${audioBlob.size}`
+          `Final blob: ${audioBlob.size} bytes, type: ${audioBlob.type}, chunks: ${audioChunksRef.current.length}`
         );
 
         try {
