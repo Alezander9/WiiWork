@@ -15,6 +15,7 @@ export default function MobileInput() {
   const [isTranscribing, setIsTranscribing] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  const [debugMessages, setDebugMessages] = useState<string[]>([]);
 
   const setInputMode = useAgentStore((state) => state.setInputMode);
   const { port: urlPort } = useParams();
@@ -35,26 +36,57 @@ export default function MobileInput() {
     return () => setInputMode("desktop");
   }, [setInputMode]);
 
+  // Helper function to add debug messages
+  const addDebugMessage = (message: string) => {
+    setDebugMessages((prev) => [...prev.slice(-4), message]); // Keep last 5 messages
+  };
+
   const startRecording = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      addDebugMessage("Requesting microphone access...");
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          sampleRate: 44100,
+        },
+      });
+      addDebugMessage("Microphone access granted");
+
+      // Check supported MIME types for this browser
+      const mimeType = MediaRecorder.isTypeSupported("audio/webm")
+        ? "audio/webm"
+        : MediaRecorder.isTypeSupported("audio/mp4")
+          ? "audio/mp4"
+          : "audio/wav";
+
+      addDebugMessage(`Using MIME type: ${mimeType}`);
+
       const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: "audio/webm", // More widely supported format
+        mimeType,
+        audioBitsPerSecond: 128000,
       });
-      console.log("MediaRecorder created with options:", {
-        mimeType: mediaRecorder.mimeType,
-        state: mediaRecorder.state,
-      });
+
+      addDebugMessage(`Recorder state: ${mediaRecorder.state}`);
+
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
+      // Start recording immediately after permissions
+      mediaRecorder.start();
+      setIsRecording(true);
+      console.log("Recording started");
+
       mediaRecorder.ondataavailable = (event) => {
-        audioChunksRef.current.push(event.data);
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+          addDebugMessage(`Received audio chunk: ${event.data.size} bytes`);
+        }
       };
 
       mediaRecorder.onstop = async () => {
         const audioBlob = new Blob(audioChunksRef.current, {
-          type: "audio/webm",
+          type: mimeType,
         });
         console.log("Recording completed, blob size:", audioBlob.size);
 
@@ -94,11 +126,10 @@ export default function MobileInput() {
         // Clean up
         stream.getTracks().forEach((track) => track.stop());
       };
-
-      mediaRecorder.start();
-      setIsRecording(true);
-      console.log("Recording started");
     } catch (error) {
+      addDebugMessage(
+        `Error: ${error instanceof Error ? error.message : String(error)}`
+      );
       console.error("Error accessing microphone:", error);
     }
   };
@@ -211,6 +242,15 @@ export default function MobileInput() {
 
           {/* Spacer */}
           <div className="flex-1" />
+
+          {/* Debug Panel */}
+          <div className="p-4 bg-black bg-opacity-80 text-white font-mono text-sm">
+            {debugMessages.map((msg, i) => (
+              <div key={i} className="py-1">
+                {msg}
+              </div>
+            ))}
+          </div>
 
           {/* Mic Button */}
           <div className="p-8 flex justify-center">
