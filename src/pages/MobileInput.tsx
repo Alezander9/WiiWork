@@ -7,6 +7,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useAction, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { AgentButton } from "@/components/agent-ui/AgentButton";
+import { useSettingsStore } from "@/stores/settingsStore";
 export default function MobileInput() {
   const [message, setMessage] = useState("");
   const [port, setPort] = useState<string>("");
@@ -22,6 +23,7 @@ export default function MobileInput() {
   const navigate = useNavigate();
   const sendMessage = useMutation(api.mutations.sendMessage);
   const transcribeAudio = useAction(api.whisper.transcribeAudio);
+  const showDebug = useSettingsStore((state) => state.showAudioDebugLogs);
 
   // Handle URL port parameter
   useEffect(() => {
@@ -274,40 +276,42 @@ export default function MobileInput() {
             </Button>
           </div>
 
-          {/* Spacer */}
-          <div className="flex-1" />
+          {/* Center Container - Modified */}
+          <div className="flex-1 flex flex-col items-center justify-center">
+            {/* Mic Button and Status - Moved here */}
+            <div className="flex flex-col items-center gap-4">
+              <button
+                className={`w-32 h-32 rounded-full transition-colors flex items-center justify-center
+                  ${
+                    isRecording
+                      ? "bg-red-500 hover:bg-red-600 text-white animate-pulse ring-4 ring-red-300"
+                      : "bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white"
+                  }`}
+                onClick={toggleRecording}
+                disabled={isResponding}
+              >
+                <Mic
+                  className={`w-16 h-16 ${isRecording ? "animate-bounce" : ""}`}
+                />
+              </button>
 
-          {/* Debug Panel */}
-          <div className="p-4 bg-black bg-opacity-80 text-white font-mono text-sm">
-            {debugMessages.map((msg, i) => (
-              <div key={i} className="py-1">
-                {msg}
+              {/* Status Message */}
+              <div className="text-center text-gray-600 font-medium">
+                {getStatusMessage()}
               </div>
-            ))}
-          </div>
-
-          {/* Mic Button */}
-          <div className="p-8 flex flex-col items-center gap-4">
-            <button
-              className={`w-32 h-32 rounded-full transition-colors flex items-center justify-center
-                ${
-                  isRecording
-                    ? "bg-red-500 hover:bg-red-600 text-white animate-pulse ring-4 ring-red-300"
-                    : "bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white"
-                }`}
-              onClick={toggleRecording}
-              disabled={isResponding}
-            >
-              <Mic
-                className={`w-16 h-16 ${isRecording ? "animate-bounce" : ""}`}
-              />
-            </button>
-
-            {/* Status Message */}
-            <div className="text-center text-gray-600 font-medium">
-              {getStatusMessage()}
             </div>
           </div>
+
+          {/* Debug Panel - Moved above text input */}
+          {showDebug && (
+            <div className="p-4 bg-black bg-opacity-80 text-white font-mono text-sm">
+              {debugMessages.map((msg, i) => (
+                <div key={i} className="py-1">
+                  {msg}
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Text Input */}
           <div className="p-4 bg-white border-t border-gray-200">

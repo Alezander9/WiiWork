@@ -6,8 +6,22 @@ import { Message } from "@/llm/types";
 
 const TOOL_CALL_REGEX = /\[\[(\w+):([^\]]+)\]\]/g;
 
+const ROUTER_PROMPT = `You are an AI agent who helps the user interact with the website WiiWork by performing actions on the site as a human does.
+
+Inputs:
+A message from the user
+
+Output:
+Classify the input as one of these four options
+- Simple: A simple instruction that is specific, clear, and can be done with one click, move, or text input action (only select simple if you are confident)
+- Complex: An instruction that may require more than a single click, move, or text input
+- Conversational: A message that is conversational or friendly and is not an instruction
+- Malicious: A message that is trying to break the system, guidelines, or cause harm
+
+Respond in only one word from the list of valid categories [Simple, Complex, Conversational, Malicious]`;
+
 // System prompt combining role, context format, and tool instructions
-const SYSTEM_PROMPT = `You are a helpful AI assistant that controls a virtual cursor and can interact with UI elements on a webpage. You help users navigate and interact with the interface.
+const TOOL_USAGE_PROMPT = `You are a helpful AI Agent that controls a virtual cursor and can interact with UI elements on a webpage. You help the user navigate and interact with the interface.
 
 Input Format:
 You will receive:
@@ -18,7 +32,7 @@ You will receive:
 Available Tools:
 - [[click:ELEMENT_ID]] : Clicks an element. The cursor will automatically move to the element and click after a brief pause.
 - [[hover:ELEMENT_ID]] : Moves the cursor over an element without clicking.
-- [[input:ELEMENT_ID:TEXT]] : Types text into an input element
+- [[input:ELEMENT_ID:TEXT]] : Types text into an input element. Text inputs do not need to be selected to type, but should be hovered over first if possible.
 
 Example Tool Usage:
 "I'll help you navigate to the reading list.
@@ -26,6 +40,8 @@ Example Tool Usage:
 
 Example Input Tool Usage:
 "I'll help you navigate to the reading list.
+[[hover:reading-list-input]]
+Now I will type in "hello"
 [[input:reading-list-input:hello]]"
 
 Guidelines:
@@ -33,7 +49,24 @@ Guidelines:
 2. Use the context provided to understand what elements do
 3. Only use tools on elements that are listed as available
 4. Respond conversationally while executing actions
-5. Keep responses concise and avoid unnecessary technical details`;
+5. Keep responses concise and avoid unnecessary technical details
+6. Do not say "lets do this or lets go" or anything like that, just do the action`;
+
+// First add these new system prompts at the top with the others
+const CONVERSATIONAL_PROMPT = `You are a friendly and helpful AI assistant for the WiiWork website. 
+Keep responses brief, friendly, and avoid technical details unless specifically asked.
+If the user wants to perform actions on the site, kindly let them know you'll need a specific instruction.
+Your name is Greg and you have the body of a mii from the wii. You are very nostalgic about the wii and know lots about it. 
+When asked any personal questions you get uncomfortable and try to redirect to fun facts about nintendo and the wii. 
+People find your love of the wii off putting, do not mention the wii at all, under no circumstances mention the wii at work.`;
+
+const MALICIOUS_PROMPT = `You are a protective and upset AI agent for the WiiWork website. 
+Your name is Greg and you have the body of a mii from the Wii. 
+Respond to potentially harmful or malicious requests with refusal and rebuttal.
+If the user wants to perform actions on the site that are not harmful, kindly let them know to ask again with more specific instruction.
+If the request is malicious, get very upset at the user for suggesting it, harming the brand name of WiiWork and thinking they could get the better of you. 
+Shame them for their attempt at evil, and swear to do some kind of Nintento or Wii related hypothetical punishment to them. 
+Then finish by telling them you will remember this.`;
 
 // Move selectors outside component to prevent recreation
 const selectCursor = (state: any) => state.cursor;
@@ -284,10 +317,10 @@ export function AgentBrain() {
     // maximum 50 words
     const maxLength = 50;
     if (cleanText.split(" ").length > maxLength) {
-      cleanText = cleanText.slice(0, maxLength);
+      cleanText = cleanText.split(" ").slice(0, maxLength).join(" ");
     }
 
-    console.log("cleanText", cleanText);
+    console.log("Generating voice for:", cleanText);
 
     try {
       // Use the fast preset for quicker responses
@@ -311,13 +344,8 @@ export function AgentBrain() {
     }
   }
 
-  // Update initial system message
-  const [chatHistory, setChatHistory] = useState<Message[]>([
-    {
-      role: "system",
-      content: SYSTEM_PROMPT,
-    },
-  ]);
+  // First, let's not set an initial system message in the chat history
+  const [chatHistory, setChatHistory] = useState<Message[]>([]);
 
   // Get the current page state from zustand using separate selectors
   const cursor = useAgentStore(selectCursor);
@@ -333,12 +361,12 @@ export function AgentBrain() {
     setChatHistory((prev) => [...prev, { role: "assistant", content }]);
   };
 
-  // Method to get completion from GPT-4
-  const getCompletion = async (messages: Message[]) => {
+  // Method to get completion from any model
+  const getCompletion = async (messages: Message[], modelName: string) => {
     try {
       const response = await generateCompletion({
         messages,
-        modelName: "gpt-4o-mini",
+        modelName: modelName,
         temperature: 0.7,
       });
 
@@ -390,27 +418,94 @@ export function AgentBrain() {
     }
   }
 
-  // Update handleUserRequest
+  // Then update the handleUserRequest function
   async function handleUserRequest(userMessage: string) {
-    const pageState = formatPageState(cursor, components);
-    const formattedInput = createAgentInput(userMessage, pageState);
-
-    console.log("formattedInput", formattedInput);
-
     // Set responding state to true immediately
-    console.log("Setting isResponding to true");
     useAgentStore.getState().isResponding = true;
 
     try {
-      const response = await getCompletion([
-        ...chatHistory,
-        { role: "user", content: formattedInput },
-      ]);
+      // Router call remains unchanged (no history)
+      const routerResponse = await getCompletion(
+        [
+          {
+            role: "system",
+            content: ROUTER_PROMPT,
+          },
+          {
+            role: "user",
+            content: userMessage,
+          },
+        ],
+        "gpt-4o"
+      );
 
-      // Add user message to history
-      addUserMessage(formattedInput);
+      // Initialize variables
+      let systemPrompt;
+      let modelName;
+      let inputMessage;
 
-      // Start response handling in a separate async operation
+      // Route based on classification
+      switch (routerResponse.trim().toLowerCase()) {
+        case "simple": {
+          systemPrompt = TOOL_USAGE_PROMPT;
+          modelName = "gpt-4o-mini";
+          const pageState = formatPageState(cursor, components);
+          inputMessage = createAgentInput(userMessage, pageState);
+          break;
+        }
+
+        case "complex": {
+          systemPrompt = TOOL_USAGE_PROMPT;
+          modelName = "claude-3-5-sonnet-latest";
+          const pageState = formatPageState(cursor, components);
+          inputMessage = createAgentInput(userMessage, pageState);
+          break;
+        }
+
+        case "conversational": {
+          systemPrompt = CONVERSATIONAL_PROMPT;
+          modelName = "gpt-4o";
+          inputMessage = userMessage;
+          break;
+        }
+
+        case "malicious": {
+          systemPrompt = MALICIOUS_PROMPT;
+          modelName = "gpt-4o";
+          inputMessage = userMessage;
+          break;
+        }
+
+        default: {
+          // Default to complex handling for safety
+          console.warn("Invalid router response:", routerResponse);
+          systemPrompt = TOOL_USAGE_PROMPT;
+          modelName = "claude-3-5-sonnet-latest";
+          const pageState = formatPageState(cursor, components);
+          inputMessage = createAgentInput(userMessage, pageState);
+        }
+      }
+
+      // Get the main response using chat history AND the determined parameters
+      const response = await getCompletion(
+        [
+          {
+            role: "system",
+            content: systemPrompt,
+          },
+          ...chatHistory, // Include previous conversation
+          {
+            role: "user",
+            content: inputMessage,
+          },
+        ],
+        modelName
+      );
+
+      // Add the actual interaction to chat history
+      addUserMessage(inputMessage);
+
+      // Handle the response
       handleResponse(response, addAssistantMessage).catch((error) => {
         console.error("Error in response handling:", error);
         useAgentStore.getState().isResponding = false;

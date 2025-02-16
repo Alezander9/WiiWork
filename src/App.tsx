@@ -9,10 +9,9 @@ import { Settings, X } from "lucide-react";
 import { useState } from "react";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { AgentLabel } from "@/components/agent-ui/AgentLabel";
-import { AgentSwitch } from "@/components/agent-ui/AgentSwitch";
-import { useAgentStore } from "@/stores/agentStore";
 import { AgentButton } from "@/components/agent-ui/AgentButton";
 import { BreadcrumbNav } from "@/components/navigation/BreadcrumbNav";
+import { useAgentStore } from "@/stores/agentStore";
 
 export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -56,26 +55,29 @@ export default function App() {
 
           {/* Settings content will go here */}
           <div className="space-y-4">
-            {/* We can add settings options here */}
+            {/* Audio Debug Toggle Button */}
             <div className="flex items-center space-x-2">
               <AgentLabel
                 htmlFor="audio-debug"
                 className="text-xs text-gray-500"
                 controlId="audio-debug-label"
-                context="This label describes the audio debug toggle switch that shows or hides debug information for audio recording"
+                context="This label describes the audio debug toggle that shows or hides debug information for audio recording"
               >
                 Audio Debug
               </AgentLabel>
-              <AgentSwitch
-                id="audio-debug"
+              <AgentButton
                 controlId="audio-debug-toggle"
-                checked={useSettingsStore((state) => state.showAudioDebugLogs)}
                 onUniversalClick={() => {
                   const store = useSettingsStore.getState();
                   store.toggleAudioDebugLogs();
                 }}
-                context="This toggle shows or hides the audio debug logs in the mobile input screen"
-              />
+                context="Click to toggle the audio debug logs in the mobile input screen"
+                className="bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white text-sm px-3 py-1"
+              >
+                {useSettingsStore((state) => state.showAudioDebugLogs)
+                  ? "Turn Off"
+                  : "Turn On"}
+              </AgentButton>
             </div>
 
             {/* Reset Agent State button */}

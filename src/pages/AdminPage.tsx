@@ -15,7 +15,7 @@ export default function AdminPage() {
     <>
       <AgentContext
         controlId="page-context"
-        context="This is the admin panel where you can manage system settings and view the current mobile input port. You can generate a new port if needed."
+        context="This is the admin panel where you can manage system settings and view the current mobile input port. You can generate a new port if needed, which will reset the connection between the users microphone and your input"
       />
 
       <div className="container mx-auto py-8 space-y-8">
@@ -39,7 +39,7 @@ export default function AdminPage() {
                 console.log("Generating new port...");
                 generateNewPort();
               }}
-              context="This button generates a new port number for mobile input connections"
+              context="This button generates a new port number for mobile input connections. This will reset the connection between the users microphone and your input. Only use this is you are certain the user knows what they are doing."
               className="w-full bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white font-normal"
             >
               Generate New Port

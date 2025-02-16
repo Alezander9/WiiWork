@@ -2,16 +2,10 @@ import { AgentContext } from "@/components/agent-ui/AgentContext";
 import { AgentButton, AgentInput } from "@/components/agent-ui";
 import { useReadingListStore } from "@/stores/readingListStore";
 import { ArticleCard } from "@/components/reading-list/ArticleCard";
-import { Grid, List, Plus, Search } from "lucide-react";
+import { Search } from "lucide-react";
 
 export default function ReadingListPage() {
-  const {
-    getFilteredArticles,
-    filters,
-    updateFilters,
-    viewMode,
-    toggleViewMode,
-  } = useReadingListStore();
+  const { getFilteredArticles, filters, updateFilters } = useReadingListStore();
 
   const articles = getFilteredArticles();
 
@@ -19,25 +13,13 @@ export default function ReadingListPage() {
     <>
       <AgentContext
         controlId="reading-list-context"
-        context="This is the reading list page where you can view and manage your saved articles. You can search articles, filter by status, and switch between grid and list views. You can also add a new article to your reading list by clicking the 'Add Article' button."
+        context="This is the reading list page where you can view and manage your saved articles. You can search articles and filter by status."
       />
 
       <div className="container mx-auto py-8 space-y-6">
-        {/* Header */}
-        <div className="flex justify-between items-center">
-          <AgentButton
-            controlId="add-article-button"
-            context="Click to add a new article to your reading list"
-            className="bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add Article
-          </AgentButton>
-        </div>
-
         {/* Filters */}
         <div className="bg-white p-4 rounded-lg shadow-sm space-y-4">
-          {/* Search and View Toggle */}
+          {/* Search */}
           <div className="flex gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -46,24 +28,11 @@ export default function ReadingListPage() {
                 placeholder="Search articles..."
                 value={filters.search}
                 onChange={(e) => updateFilters({ search: e.target.value })}
-                context="Type here to search articles by title or description"
+                onUniversalInput={(value) => updateFilters({ search: value })}
+                context="Type here to search articles by title or description. You can clear the search by entering in a blank search."
                 className="pl-10 w-full"
               />
             </div>
-            <AgentButton
-              controlId="view-mode-toggle"
-              onUniversalClick={toggleViewMode}
-              context={`Click to switch to ${
-                viewMode === "grid" ? "list" : "grid"
-              } view`}
-              className="bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white"
-            >
-              {viewMode === "grid" ? (
-                <List className="w-4 h-4" />
-              ) : (
-                <Grid className="w-4 h-4" />
-              )}
-            </AgentButton>
           </div>
 
           {/* Filter Buttons */}
@@ -119,14 +88,8 @@ export default function ReadingListPage() {
           </div>
         </div>
 
-        {/* Articles Grid/List */}
-        <div
-          className={`grid gap-6 ${
-            viewMode === "grid"
-              ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-              : "grid-cols-1"
-          }`}
-        >
+        {/* Articles Grid */}
+        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {articles.map((article) => (
             <ArticleCard key={article.id} article={article} />
           ))}
@@ -135,7 +98,7 @@ export default function ReadingListPage() {
         {/* Empty State */}
         {articles.length === 0 && (
           <div className="text-center py-12 text-gray-500">
-            No articles found. Try adjusting your filters or add a new article.
+            No articles found. Try adjusting your filters.
           </div>
         )}
       </div>

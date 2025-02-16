@@ -3,16 +3,18 @@ import {
   AgentButton,
   AgentIconButton,
   AgentInput,
-  AgentSwitch,
 } from "@/components/agent-ui";
 import { Bell } from "lucide-react";
 
 export default function DemoPage() {
   const [buttonText, setButtonText] = useState("");
   const [iconButtonText, setIconButtonText] = useState("");
-  const [inputText, setInputText] = useState("");
-  const [switchText, setSwitchText] = useState("");
-  const [inputValue, setInputValue] = useState("");
+  const [input1Text, setInput1Text] = useState("");
+  const [input2Text, setInput2Text] = useState("");
+  const [input3Text, setInput3Text] = useState("");
+  const [input1Value, setInput1Value] = useState("");
+  const [input2Value, setInput2Value] = useState("");
+  const [input3Value, setInput3Value] = useState("");
 
   // Function to handle text fade
   const showTextWithFade = (
@@ -25,6 +27,19 @@ export default function DemoPage() {
 
   return (
     <div className="min-h-screen bg-wii-bg-light p-8">
+      {/* Instructions Header */}
+      <div className="max-w-2xl mx-auto mb-12 text-center">
+        <h1 className="text-3xl font-bold text-black mb-4">
+          Agent Interaction Demo
+        </h1>
+        <p className="text-xl text-black">
+          Try asking the agent to interact with these components!
+        </p>
+        <p className="text-gray-600 mt-2">
+          Example: "Click the test button" or "Type 'hello' in the first input"
+        </p>
+      </div>
+
       <div className="max-w-2xl mx-auto grid grid-cols-2 gap-16">
         {/* Regular Button */}
         <div className="flex flex-col items-center gap-4">
@@ -60,40 +75,73 @@ export default function DemoPage() {
           </p>
         </div>
 
-        {/* Text Input */}
-        <div className="flex flex-col items-center gap-4">
-          <AgentInput
-            controlId="demo-test-input"
-            placeholder="Type here..."
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onUniversalClick={() =>
-              showTextWithFade(setInputText, "Input clicked")
-            }
-            onUniversalInput={(value) => {
-              setInputValue(value);
-              showTextWithFade(setInputText, `Input set to: ${value}`);
-            }}
-            context="This is a test input field that can be clicked and typed into. Use [[input:demo-test-input:hello]] to type text"
-            className="w-48"
-          />
-          <p className="text-wii-blue transition-opacity duration-500 h-6">
-            {inputText}
-          </p>
-        </div>
+        {/* Three Inputs Row */}
+        <div className="col-span-2 grid grid-cols-3 gap-8">
+          {/* Input 1 */}
+          <div className="flex flex-col items-center gap-4">
+            <AgentInput
+              controlId="demo-test-input-1"
+              placeholder="First input..."
+              value={input1Value}
+              onChange={(e) => setInput1Value(e.target.value)}
+              onUniversalClick={() =>
+                showTextWithFade(setInput1Text, "Input 1 clicked")
+              }
+              onUniversalInput={(value) => {
+                setInput1Value(value);
+                showTextWithFade(setInput1Text, `Input 1 set to: ${value}`);
+              }}
+              context="This is the first test input that can be clicked and typed into. Use [[input:demo-test-input-1:hello]] to type text"
+              className="w-full"
+            />
+            <p className="text-wii-blue transition-opacity duration-500 h-6">
+              {input1Text}
+            </p>
+          </div>
 
-        {/* Switch */}
-        <div className="flex flex-col items-center gap-4">
-          <AgentSwitch
-            controlId="demo-test-switch"
-            onCheckedChange={() =>
-              showTextWithFade(setSwitchText, "Switch clicked")
-            }
-            context="This is a test switch that displays text when toggled"
-          />
-          <p className="text-wii-blue transition-opacity duration-500 h-6">
-            {switchText}
-          </p>
+          {/* Input 2 */}
+          <div className="flex flex-col items-center gap-4">
+            <AgentInput
+              controlId="demo-test-input-2"
+              placeholder="Second input..."
+              value={input2Value}
+              onChange={(e) => setInput2Value(e.target.value)}
+              onUniversalClick={() =>
+                showTextWithFade(setInput2Text, "Input 2 clicked")
+              }
+              onUniversalInput={(value) => {
+                setInput2Value(value);
+                showTextWithFade(setInput2Text, `Input 2 set to: ${value}`);
+              }}
+              context="This is the second test input that can be clicked and typed into. Use [[input:demo-test-input-2:hello]] to type text"
+              className="w-full"
+            />
+            <p className="text-wii-blue transition-opacity duration-500 h-6">
+              {input2Text}
+            </p>
+          </div>
+
+          {/* Input 3 */}
+          <div className="flex flex-col items-center gap-4">
+            <AgentInput
+              controlId="demo-test-input-3"
+              placeholder="Third input..."
+              value={input3Value}
+              onChange={(e) => setInput3Value(e.target.value)}
+              onUniversalClick={() =>
+                showTextWithFade(setInput3Text, "Input 3 clicked")
+              }
+              onUniversalInput={(value) => {
+                setInput3Value(value);
+                showTextWithFade(setInput3Text, `Input 3 set to: ${value}`);
+              }}
+              context="This is the third test input that can be clicked and typed into. Use [[input:demo-test-input-3:hello]] to type text"
+              className="w-full"
+            />
+            <p className="text-wii-blue transition-opacity duration-500 h-6">
+              {input3Text}
+            </p>
+          </div>
         </div>
       </div>
     </div>
