@@ -21,15 +21,23 @@ export class WhisperService {
         // For server-side (Convex)
         formData.append(
           "file",
-          new Blob([audioData], { type: "audio/webm" }),
+          new Blob([audioData], { type: "audio/webm;codecs=opus" }),
           "recording.webm"
         );
       } else {
         // For client-side (Browser)
-        formData.append("file", audioData as any, "recording.webm"); // Temporary type assertion
+        formData.append("file", audioData as any, "recording.webm");
       }
       formData.append("model", "whisper-1");
       formData.append("response_format", "text");
+
+      // Log the actual file being sent
+      const file = formData.get("file") as File;
+      console.log("Sending file:", {
+        type: file.type,
+        size: file.size,
+        name: file.name,
+      });
 
       console.log("Sending request to OpenAI...");
       const response = await fetch(

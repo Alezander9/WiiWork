@@ -54,11 +54,13 @@ export default function MobileInput() {
       addDebugMessage("Microphone access granted");
 
       // Check supported MIME types for this browser
-      const mimeType = MediaRecorder.isTypeSupported("audio/webm")
-        ? "audio/webm"
-        : MediaRecorder.isTypeSupported("audio/mp4")
-          ? "audio/mp4"
-          : "audio/wav";
+      const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
+        ? "audio/webm;codecs=opus"
+        : MediaRecorder.isTypeSupported("audio/ogg;codecs=opus")
+          ? "audio/ogg;codecs=opus"
+          : MediaRecorder.isTypeSupported("audio/mp4")
+            ? "audio/mp4"
+            : "audio/wav";
 
       addDebugMessage(`Using MIME type: ${mimeType}`);
 
@@ -85,10 +87,13 @@ export default function MobileInput() {
       };
 
       mediaRecorder.onstop = async () => {
+        addDebugMessage("Creating final audio blob...");
         const audioBlob = new Blob(audioChunksRef.current, {
           type: mimeType,
         });
-        console.log("Recording completed, blob size:", audioBlob.size);
+        addDebugMessage(
+          `Final blob type: ${audioBlob.type}, size: ${audioBlob.size}`
+        );
 
         try {
           setIsTranscribing(true);
@@ -97,6 +102,7 @@ export default function MobileInput() {
           const base64Audio = btoa(
             String.fromCharCode(...new Uint8Array(buffer))
           );
+          addDebugMessage(`Converted to base64, length: ${base64Audio.length}`);
 
           // Call Convex action
           const result = await transcribeAudio({ audioData: base64Audio });
