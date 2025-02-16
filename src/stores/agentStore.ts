@@ -42,6 +42,10 @@ interface AgentStore {
   };
   setCursorVisible: (visible: boolean) => void;
   setCursorPosition: (position: { x: number; y: number }) => void;
+  inputMode: "desktop" | "mobile";
+  setInputMode: (mode: "desktop" | "mobile") => void;
+  port: string;
+  generateNewPort: () => void;
 }
 
 export const useAgentStore = create<AgentStore>((set, get) => ({
@@ -144,5 +148,23 @@ export const useAgentStore = create<AgentStore>((set, get) => ({
         position,
       },
     }));
+  },
+
+  inputMode: "desktop",
+  setInputMode: (mode) => {
+    set((state) => ({
+      inputMode: mode,
+      cursor: {
+        ...state.cursor,
+        visible: mode === "desktop", // Automatically handle cursor visibility
+      },
+    }));
+  },
+
+  port: "",
+  generateNewPort: () => {
+    const newPort = Math.floor(100000 + Math.random() * 900000).toString();
+    console.log("Generated port:", newPort); // Temporary logging
+    set({ port: newPort });
   },
 }));

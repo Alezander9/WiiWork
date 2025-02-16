@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useAgentStore } from "@/stores/agentStore";
 
 interface AgentInputProps {
   onSendMessage: (message: string) => void;
@@ -21,6 +22,7 @@ export function AgentInput({ onSendMessage, agentResponse }: AgentInputProps) {
   const [message, setMessage] = useState("");
   const [displayedText, setDisplayedText] = useState("");
   const responseEndRef = useRef<HTMLDivElement>(null);
+  const inputMode = useAgentStore((state) => state.inputMode);
 
   // Typewriter effect when agentResponse changes
   useEffect(() => {
@@ -63,7 +65,7 @@ export function AgentInput({ onSendMessage, agentResponse }: AgentInputProps) {
     }
   };
 
-  return (
+  return inputMode === "mobile" ? null : (
     <div className="fixed bottom-0 left-0 right-0">
       {/* Floating dialog style */}
       <div className="max-h-32 p-4">

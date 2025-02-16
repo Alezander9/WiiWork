@@ -8,6 +8,7 @@ import { AgentInput } from "./components/agent/AgentInput.tsx";
 import { AgentCursor } from "./components/agent/AgentCursor.tsx";
 import { useAgentStore } from "@/stores/agentStore";
 import { useState } from "react";
+import { AgentMobileInput } from "./components/agent/AgentMobileInput.tsx";
 
 // Create a Convex client
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL);
@@ -22,6 +23,7 @@ function Root() {
       const response = await (window as any).__agentBrain.handleUserRequest(
         message
       );
+      console.log("Response:", response);
       setAgentResponse(response);
     } catch (error) {
       console.error("Error sending message:", error);
@@ -36,11 +38,12 @@ function Root() {
       <ConvexProvider client={convex}>
         <AgentBrain />
         {cursorVisible && <AgentCursor position={cursorPosition} />}
-        <App />
         <AgentInput
           onSendMessage={handleSendMessage}
           agentResponse={agentResponse}
         />
+        <AgentMobileInput onSendMessage={handleSendMessage} />
+        <App />
       </ConvexProvider>
     </StrictMode>
   );

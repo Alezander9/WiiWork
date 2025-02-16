@@ -10,7 +10,7 @@ export default function WelcomePage() {
     <>
       <AgentContext
         controlId="page-context"
-        context="This is the main welcome page. From here, users can access their reading list or the admin panel. The reading list contains saved articles, while the admin panel provides system management options."
+        context="This is the main welcome page. From here, users can access their reading list, the admin panel, or the mobile input page. The reading list contains saved articles, while the admin panel provides system management options."
       />
 
       <div className="container mx-auto py-8 space-y-8">
@@ -55,6 +55,18 @@ export default function WelcomePage() {
             className="w-64 bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white font-normal"
           >
             Admin Panel
+          </AgentButton>
+
+          <AgentButton
+            controlId="mobile-input-button"
+            onUniversalClick={() => {
+              console.log("Mobile Input clicked!");
+              navigate("/mobile-input");
+            }}
+            context="This button navigates to the mobile input page where you can connect a mobile device for input"
+            className="w-64 bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white font-normal"
+          >
+            Mobile Input
           </AgentButton>
         </div>
       </div>
