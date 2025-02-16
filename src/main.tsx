@@ -9,6 +9,7 @@ import { AgentCursor } from "./components/agent/AgentCursor.tsx";
 import { useAgentStore } from "@/stores/agentStore";
 import { useState } from "react";
 import { AgentMobileInput } from "./components/agent/AgentMobileInput.tsx";
+import "./styles/globals.css";
 
 // Create a Convex client
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL);

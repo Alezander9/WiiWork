@@ -43,8 +43,8 @@ export default function ReadingListPage() {
               context="Show all articles regardless of status"
               className={`${
                 filters.status === "all"
-                  ? "bg-wii-blue text-white"
-                  : "bg-wii-button-blue"
+                  ? "bg-gray-200 text-black border-2 border-blue-300 rounded-xl"
+                  : "bg-gray-100 text-black border-2 border-blue-200 hover:bg-gray-200 rounded-xl"
               }`}
             >
               All
@@ -55,8 +55,8 @@ export default function ReadingListPage() {
               context="Show only unread articles"
               className={`${
                 filters.status === "unread"
-                  ? "bg-wii-blue text-white"
-                  : "bg-wii-button-blue"
+                  ? "bg-gray-200 text-black border-2 border-blue-300 rounded-xl"
+                  : "bg-gray-100 text-black border-2 border-blue-200 hover:bg-gray-200 rounded-xl"
               }`}
             >
               Unread
@@ -67,8 +67,8 @@ export default function ReadingListPage() {
               context="Show only read articles"
               className={`${
                 filters.status === "read"
-                  ? "bg-wii-blue text-white"
-                  : "bg-wii-button-blue"
+                  ? "bg-gray-200 text-black border-2 border-blue-300 rounded-xl"
+                  : "bg-gray-100 text-black border-2 border-blue-200 hover:bg-gray-200 rounded-xl"
               }`}
             >
               Read
@@ -79,8 +79,8 @@ export default function ReadingListPage() {
               context="Show only archived articles"
               className={`${
                 filters.status === "archived"
-                  ? "bg-wii-blue text-white"
-                  : "bg-wii-button-blue"
+                  ? "bg-gray-200 text-black border-2 border-blue-300 rounded-xl"
+                  : "bg-gray-100 text-black border-2 border-blue-200 hover:bg-gray-200 rounded-xl"
               }`}
             >
               Archived

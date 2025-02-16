@@ -26,7 +26,7 @@ export default function DemoPage() {
   };
 
   return (
-    <div className="min-h-screen bg-wii-bg-light p-8">
+    <div className="min-h-screen p-8">
       {/* Instructions Header */}
       <div className="max-w-2xl mx-auto mb-12 text-center">
         <h1 className="text-3xl font-bold text-black mb-4">
@@ -49,7 +49,7 @@ export default function DemoPage() {
               showTextWithFade(setButtonText, "Button clicked")
             }
             context="This is a test button that displays text when clicked"
-            className="bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white"
+            className="bg-gray-100 hover:bg-gray-200 text-black border-2 border-blue-200 shadow-sm rounded-xl"
           >
             Test Button
           </AgentButton>
@@ -66,7 +66,7 @@ export default function DemoPage() {
               showTextWithFade(setIconButtonText, "Icon Button clicked")
             }
             context="This is a test icon button that displays text when clicked"
-            className="bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white h-10 w-10"
+            className="bg-gray-100 hover:bg-gray-200 text-black border-2 border-blue-200 shadow-sm rounded-xl h-10 w-10"
           >
             <Bell className="h-5 w-5" />
           </AgentIconButton>

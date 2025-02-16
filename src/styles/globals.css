@@ -1,0 +1,9 @@
+.wii-background {
+  background: repeating-linear-gradient(
+    0deg,
+    #e9eaea 0px,
+    /* Wii Background Dark */ #e9eaea 3px,
+    #f1f1f1 5px,
+    /* Wii Background Light */ #f1f1f1 6px
+  );
+}

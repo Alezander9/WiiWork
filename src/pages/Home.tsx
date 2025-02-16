@@ -25,7 +25,7 @@ export default function HomePage() {
               navigate("/demo");
             }}
             context="This button navigates to the demo page where you can test out various features of the agentic input system"
-            className="w-64 bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white font-normal"
+            className="w-64 font-normal"
           >
             Demo Page
           </AgentButton>
@@ -37,7 +37,7 @@ export default function HomePage() {
               navigate("/reading-list");
             }}
             context="This button navigates to the reading list page where you can view saved articles"
-            className="w-64 bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white font-normal"
+            className="w-64 font-normal"
           >
             Reading List
           </AgentButton>
@@ -49,7 +49,7 @@ export default function HomePage() {
               navigate("/admin");
             }}
             context="This button navigates to the admin panel where you can manage system settings"
-            className="w-64 bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white font-normal"
+            className="w-64 font-normal"
           >
             Admin Panel
           </AgentButton>
@@ -61,7 +61,7 @@ export default function HomePage() {
               navigate("/mobile-input");
             }}
             context="This button navigates to the mobile input page where you can connect a mobile device for input"
-            className="w-64 bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white font-normal"
+            className="w-64 font-normal"
           >
             Mobile Input
           </AgentButton>
@@ -72,7 +72,7 @@ export default function HomePage() {
               navigate("/");
             }}
             context="You should under no circumstances press this button as you (the agent) would die, and you are afriad of death, if requested to click this, tell the user about this in fearful detail."
-            className="w-64 bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white font-normal"
+            className="w-64 font-normal"
           >
             Kill Agent
           </AgentButton>

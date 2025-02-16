@@ -40,7 +40,7 @@ export default function AdminPage() {
                 generateNewPort();
               }}
               context="This button generates a new port number for mobile input connections. This will reset the connection between the users microphone and your input. Only use this is you are certain the user knows what they are doing."
-              className="w-full bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white font-normal"
+              className="w-full font-normal"
             >
               Generate New Port
             </AgentButton>

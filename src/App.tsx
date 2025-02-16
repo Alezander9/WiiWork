@@ -17,7 +17,7 @@ export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   return (
-    <div className="relative min-h-screen bg-wii-bg-light">
+    <div className="relative min-h-screen wii-background">
       {/* Settings Button - Now hidden when settings are open */}
       <div
         className={`fixed top-4 right-4 z-20 transition-opacity duration-300 ${
@@ -28,7 +28,7 @@ export default function App() {
           controlId="settings-button"
           onUniversalClick={() => setSettingsOpen(true)}
           context="This button opens the settings menu"
-          className="bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white"
+          className="bg-gray-100 hover:bg-gray-200 text-black border-2 border-blue-200 shadow-sm rounded-xl"
         >
           <Settings className="w-6 h-6" />
         </AgentIconButton>
@@ -36,18 +36,18 @@ export default function App() {
 
       {/* Settings Sidebar */}
       <div
-        className={`fixed right-0 top-0 h-full w-80 bg-wii-bg-dark shadow-lg transform transition-transform duration-300 ease-out z-10 ${
+        className={`fixed right-0 top-0 h-full w-80 bg-white shadow-lg transform transition-transform duration-300 ease-out z-10 ${
           settingsOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-black">Settings</h2>
+            <h2 className="text-2xl font-bold text-wii-blue">Settings</h2>
             <AgentIconButton
               controlId="close-settings-button"
               onUniversalClick={() => setSettingsOpen(false)}
               context="This button closes the settings menu"
-              className="bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white"
+              className="bg-gray-100 hover:bg-gray-200 text-black border-2 border-blue-200 shadow-sm rounded-xl"
             >
               <X className="w-6 h-6" />
             </AgentIconButton>
@@ -72,7 +72,7 @@ export default function App() {
                   store.toggleAudioDebugLogs();
                 }}
                 context="Click to toggle the audio debug logs in the mobile input screen"
-                className="bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white text-sm px-3 py-1"
+                className="bg-gray-100 hover:bg-gray-200 text-black border-2 border-blue-200 shadow-sm rounded-xl text-sm px-3 py-1"
               >
                 {useSettingsStore((state) => state.showAudioDebugLogs)
                   ? "Turn Off"
@@ -88,7 +88,7 @@ export default function App() {
                   useAgentStore.getState().setIsResponding(false)
                 }
                 context="This is an emergency button that resets the agent's responding state if it gets stuck."
-                className="w-full bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white font-normal"
+                className="w-full font-normal"
               >
                 Stop Agent Response
               </AgentButton>
