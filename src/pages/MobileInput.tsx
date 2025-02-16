@@ -52,25 +52,44 @@ export default function MobileInput() {
         },
       });
 
-      // Prioritize webm, then fallback to other formats
-      const preferredTypes = [
+      // Test and log all potential formats
+      const allTypes = [
         "audio/webm",
+        "audio/webm;codecs=opus",
+        "audio/ogg",
+        "audio/ogg;codecs=opus",
+        "audio/mp4",
+        "audio/mp4;codecs=mp4a",
+        "audio/aac",
+        "audio/mpeg",
+      ];
+
+      const supportedTypes = allTypes.filter((type) => {
+        const isSupported = MediaRecorder.isTypeSupported(type);
+        addDebugMessage(`${type}: ${isSupported ? "✓" : "✗"}`);
+        return isSupported;
+      });
+
+      // Prioritize webm with opus codec, then regular webm, then others
+      const preferredOrder = [
+        "audio/webm;codecs=opus",
+        "audio/webm",
+        "audio/ogg;codecs=opus",
+        "audio/ogg",
         "audio/mp4",
         "audio/aac",
         "audio/mpeg",
       ];
-      const mimeType = preferredTypes.find((type) =>
-        MediaRecorder.isTypeSupported(type)
-      );
 
-      // log supported types
-      console.log("Supported types:", MediaRecorder.isTypeSupported);
+      const mimeType = preferredOrder.find((type) =>
+        supportedTypes.includes(type)
+      );
 
       if (!mimeType) {
         throw new Error("No supported audio MIME types found");
       }
 
-      addDebugMessage(`Using MIME type: ${mimeType}`);
+      addDebugMessage(`Selected MIME type: ${mimeType}`);
 
       const mediaRecorder = new MediaRecorder(stream, {
         mimeType,
