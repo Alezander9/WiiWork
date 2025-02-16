@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAgentStore } from "@/stores/agentStore";
+import avatarIdle from "@/assets/avatarIdle.png";
+import avatarTalking from "@/assets/avatarTalking.png";
 
 interface AgentInputProps {
   onSendMessage: (message: string) => void;
@@ -23,7 +25,7 @@ export function AgentInput({ onSendMessage, agentResponse }: AgentInputProps) {
   const [displayedText, setDisplayedText] = useState("");
   const responseEndRef = useRef<HTMLDivElement>(null);
   const inputMode = useAgentStore((state) => state.inputMode);
-
+  const isResponding = useAgentStore((state) => state.isResponding);
   // Typewriter effect when agentResponse changes
   useEffect(() => {
     if (!agentResponse) return;
@@ -66,35 +68,66 @@ export function AgentInput({ onSendMessage, agentResponse }: AgentInputProps) {
   };
 
   return inputMode === "mobile" ? null : (
-    <div className="fixed bottom-0 left-0 right-0 z-10">
+    <div className="bg-white/30 backdrop-blur-md fixed bottom-0 left-0 right-0 z-10 flex flex-col justify-end">
       {/* Floating dialog style */}
-      <div className="max-h-32 p-4">
-        {displayedText && (
-          <div className="text-lg text-gray-800 leading-relaxed whitespace-pre-line font-medium drop-shadow-sm">
-            {displayedText}
+      {displayedText && (
+        <div className="max-h-32 relative z-20">
+          <div className="rounded-lg shadow-lg p-2">
+            <div className="text-lg text-gray-800 leading-relaxed whitespace-pre-line font-medium">
+              {displayedText}
+            </div>
+            <div ref={responseEndRef} />
           </div>
-        )}
-        <div ref={responseEndRef} />
+        </div>
+      )}
+
+      {/* Agent Avatar - Centered in the blurred background */}
+      <div className="absolute bottom-4 right-32 translate-x-1/2 w-56 h-56 z-10">
+        <div className="relative w-full h-full">
+          {/* Idle image */}
+          <img
+            src={avatarIdle}
+            alt="Agent idle"
+            className="absolute inset-0 w-full h-full object-contain transition-opacity duration-300"
+            style={{
+              opacity: isResponding ? 0 : 1,
+            }}
+          />
+          {/* Talking image */}
+          <img
+            src={avatarTalking}
+            alt="Agent talking"
+            className="absolute inset-0 w-full h-full object-contain transition-opacity duration-300"
+            style={{
+              opacity: isResponding ? 1 : 0,
+            }}
+          />
+        </div>
       </div>
 
-      {/* Input Form - Wii-style */}
-      <div className="bg-white border-t border-gray-200 shadow-lg">
-        <form onSubmit={handleSubmit} className="p-4 flex gap-2">
-          <Input
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder="Ask the agent to help you navigate..."
-            className="flex-1 border-wii-blue border-opacity-50 focus:ring-wii-blue"
-          />
-          <Button
-            type="submit"
-            disabled={!message.trim()}
-            className="bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white"
+      {/* Input Form - Wii-style, overlaid on top */}
+      {!isResponding && (
+        <div className="bg-white/80 backdrop-blur-sm border-t border-gray-200 shadow-lg relative z-30">
+          <form
+            onSubmit={handleSubmit}
+            className="p-4 flex gap-2 max-w-2xl mx-auto"
           >
-            Send
-          </Button>
-        </form>
-      </div>
+            <Input
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Ask the agent to help you navigate..."
+              className="flex-1 border-wii-blue border-opacity-50 focus:ring-wii-blue bg-white/90"
+            />
+            <Button
+              type="submit"
+              disabled={!message.trim()}
+              className="bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white"
+            >
+              Send
+            </Button>
+          </form>
+        </div>
+      )}
     </div>
   );
 }

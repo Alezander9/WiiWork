@@ -12,10 +12,11 @@ export default function MobileInput() {
   const [message, setMessage] = useState("");
   const [port, setPort] = useState<string>("");
   const [isRecording, setIsRecording] = useState(false);
-  const [isTranscribing, setIsTranscribing] = useState(false);
+  const [processingFile, setProcessingFile] = useState<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const [debugMessages, setDebugMessages] = useState<string[]>([]);
+  const isResponding = useAgentStore((state) => state.isResponding);
 
   const setInputMode = useAgentStore((state) => state.setInputMode);
   const { port: urlPort } = useParams();
@@ -123,7 +124,7 @@ export default function MobileInput() {
         );
 
         try {
-          setIsTranscribing(true);
+          setProcessingFile(mimeType);
           // Convert Blob to base64
           const buffer = await audioBlob.arrayBuffer();
           const base64Audio = btoa(
@@ -156,7 +157,7 @@ export default function MobileInput() {
           console.error("Failed to process audio:", error);
           console.log("Failed to process audio");
         } finally {
-          setIsTranscribing(false);
+          setProcessingFile(null);
         }
 
         // Clean up
@@ -212,6 +213,14 @@ export default function MobileInput() {
   const handleDisconnect = () => {
     setPort("");
     navigate("/mobile-input"); // Remove port from URL
+  };
+
+  // Get status message based on current state
+  const getStatusMessage = () => {
+    if (isRecording) return "Recording...";
+    if (processingFile) return `Processing file as ${processingFile}...`;
+    if (isResponding) return "Agent is responding...";
+    return "Tap microphone to start recording";
   };
 
   return (
@@ -289,23 +298,26 @@ export default function MobileInput() {
           </div>
 
           {/* Mic Button */}
-          <div className="p-8 flex justify-center">
+          <div className="p-8 flex flex-col items-center gap-4">
             <button
               className={`w-32 h-32 rounded-full transition-colors flex items-center justify-center
                 ${
                   isRecording
                     ? "bg-red-500 hover:bg-red-600 text-white animate-pulse ring-4 ring-red-300"
-                    : isTranscribing
-                      ? "bg-yellow-500 hover:bg-yellow-600 text-white"
-                      : "bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white"
+                    : "bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white"
                 }`}
               onClick={toggleRecording}
-              disabled={isTranscribing}
+              disabled={isResponding}
             >
               <Mic
                 className={`w-16 h-16 ${isRecording ? "animate-bounce" : ""}`}
               />
             </button>
+
+            {/* Status Message */}
+            <div className="text-center text-gray-600 font-medium">
+              {getStatusMessage()}
+            </div>
           </div>
 
           {/* Text Input */}

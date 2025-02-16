@@ -274,6 +274,7 @@ export function AgentBrain() {
       console.error("Error executing tool calls:", error);
     } finally {
       // Set responding to false only after everything is done
+      console.log("Setting isResponding to false");
       useAgentStore.getState().isResponding = false;
     }
   }
@@ -283,7 +284,10 @@ export function AgentBrain() {
     const pageState = formatPageState(cursor, components);
     const formattedInput = createAgentInput(userMessage, pageState);
 
+    console.log("formattedInput", formattedInput);
+
     // Set responding state to true immediately
+    console.log("Setting isResponding to true");
     useAgentStore.getState().isResponding = true;
 
     try {

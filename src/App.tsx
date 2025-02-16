@@ -3,10 +3,12 @@ import HomePage from "./pages/Home";
 import ReadingListPage from "./pages/ReadingListPage";
 import AdminPage from "./pages/AdminPage";
 import MobileInput from "./pages/MobileInput";
-import { AgentAvatar } from "@/components/agent/AgentAvatar";
 import { AgentIconButton } from "@/components/agent-ui";
 import { Settings, X } from "lucide-react";
 import { useState } from "react";
+import { useSettingsStore } from "@/stores/settingsStore";
+import { AgentLabel } from "@/components/agent-ui/AgentLabel";
+import { AgentSwitch } from "@/components/agent-ui/AgentSwitch";
 
 export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -51,6 +53,25 @@ export default function App() {
           {/* Settings content will go here */}
           <div className="space-y-4">
             {/* We can add settings options here */}
+            <div className="flex items-center space-x-2">
+              <AgentLabel
+                htmlFor="audio-debug"
+                className="text-xs text-gray-500"
+                controlId="audio-debug-label"
+                context="This label describes the audio debug toggle switch that shows or hides debug information for audio recording"
+              >
+                Audio Debug
+              </AgentLabel>
+              <AgentSwitch
+                id="audio-debug"
+                controlId="audio-debug-toggle"
+                checked={useSettingsStore((state) => state.showAudioDebugLogs)}
+                onCheckedChange={useSettingsStore(
+                  (state) => state.toggleAudioDebugLogs
+                )}
+                context="This toggle shows or hides the audio debug logs in the mobile input screen"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -64,7 +85,6 @@ export default function App() {
           <Route path="/mobile-input" element={<MobileInput />} />
           <Route path="/mobile-input/:port" element={<MobileInput />} />
         </Routes>
-        <AgentAvatar />
       </BrowserRouter>
     </div>
   );
