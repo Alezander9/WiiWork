@@ -22,7 +22,7 @@ interface ComponentData {
   context?: string;
 }
 
-interface AgentStore {
+interface AgentState {
   components: {
     [id: string]: ComponentData;
   };
@@ -46,9 +46,11 @@ interface AgentStore {
   setInputMode: (mode: "desktop" | "mobile") => void;
   port: string;
   generateNewPort: () => void;
+  isResponding: boolean;
+  lastResponseTime: number | null;
 }
 
-export const useAgentStore = create<AgentStore>((set, get) => ({
+export const useAgentStore = create<AgentState>()((set, get) => ({
   components: {},
 
   registerComponent: (id, ref, handlers, context?) => {
@@ -167,4 +169,13 @@ export const useAgentStore = create<AgentStore>((set, get) => ({
     console.log("Generated port:", newPort); // Temporary logging
     set({ port: newPort });
   },
+
+  isResponding: false,
+  lastResponseTime: null,
+
+  setResponding: (isResponding: boolean) =>
+    set((state) => ({
+      isResponding,
+      lastResponseTime: isResponding ? state.lastResponseTime : Date.now(),
+    })),
 }));

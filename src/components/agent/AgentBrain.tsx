@@ -245,15 +245,46 @@ export function AgentBrain() {
     }
   };
 
-  // Add tool execution to handleUserRequest
+  // Add this helper function
+  async function handleResponse(
+    response: string,
+    addAssistantMessage: (content: string) => void
+  ) {
+    // First, update the UI with the response
+    addAssistantMessage(response);
+
+    try {
+      const toolCalls = parseToolCalls(response);
+      await sleep(500); // Give user time to start reading
+
+      for (const toolCall of toolCalls) {
+        try {
+          await executeToolCall(toolCall);
+        } catch (error) {
+          if ((error as ToolCallError).type === "INVALID_TOOL") {
+            console.error(`Invalid tool call: ${toolCall.fullMatch}`);
+          } else if ((error as ToolCallError).type === "INVALID_TARGET") {
+            console.error(`Invalid target in tool call: ${toolCall.fullMatch}`);
+          } else {
+            throw error;
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error executing tool calls:", error);
+    } finally {
+      // Set responding to false only after everything is done
+      useAgentStore.getState().isResponding = false;
+    }
+  }
+
+  // Update handleUserRequest
   async function handleUserRequest(userMessage: string) {
     const pageState = formatPageState(cursor, components);
     const formattedInput = createAgentInput(userMessage, pageState);
 
-    // Add user message to history
-    addUserMessage(formattedInput);
-
-    console.log("formattedInput", formattedInput);
+    // Set responding state to true immediately
+    useAgentStore.getState().isResponding = true;
 
     try {
       const response = await getCompletion([
@@ -261,38 +292,19 @@ export function AgentBrain() {
         { role: "user", content: formattedInput },
       ]);
 
-      // First, update the UI with the response
-      addAssistantMessage(response);
+      // Add user message to history
+      addUserMessage(formattedInput);
 
-      // Then start tool execution in a separate async operation
-      setTimeout(async () => {
-        try {
-          const toolCalls = parseToolCalls(response);
-          await sleep(500); // Give user time to start reading
-
-          for (const toolCall of toolCalls) {
-            try {
-              await executeToolCall(toolCall);
-            } catch (error) {
-              if ((error as ToolCallError).type === "INVALID_TOOL") {
-                console.error(`Invalid tool call: ${toolCall.fullMatch}`);
-              } else if ((error as ToolCallError).type === "INVALID_TARGET") {
-                console.error(
-                  `Invalid target in tool call: ${toolCall.fullMatch}`
-                );
-              } else {
-                throw error;
-              }
-            }
-          }
-        } catch (error) {
-          console.error("Error executing tool calls:", error);
-        }
-      }, 0);
+      // Start response handling in a separate async operation
+      handleResponse(response, addAssistantMessage).catch((error) => {
+        console.error("Error in response handling:", error);
+        useAgentStore.getState().isResponding = false;
+      });
 
       return response;
     } catch (error) {
       console.error("Error handling user request:", error);
+      useAgentStore.getState().isResponding = false;
       throw error;
     }
   }
