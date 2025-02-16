@@ -3,6 +3,7 @@ import WelcomePage from "./pages/WelcomePage";
 import ReadingListPage from "./pages/ReadingListPage";
 import AdminPage from "./pages/AdminPage";
 import MobileInput from "./pages/MobileInput";
+import { AgentAvatar } from "@/components/agent-ui/AgentAvatar";
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
         <Route path="/mobile-input" element={<MobileInput />} />
         <Route path="/mobile-input/:port" element={<MobileInput />} />
       </Routes>
+      <AgentAvatar />
     </BrowserRouter>
   );
 }

@@ -66,7 +66,7 @@ export function AgentInput({ onSendMessage, agentResponse }: AgentInputProps) {
   };
 
   return inputMode === "mobile" ? null : (
-    <div className="fixed bottom-0 left-0 right-0">
+    <div className="fixed bottom-0 left-0 right-0 z-10">
       {/* Floating dialog style */}
       <div className="max-h-32 p-4">
         {displayedText && (

@@ -17,7 +17,7 @@ export const internalTranscribeAudio = internalAction({
   args: {
     audioData: v.string(), // Base64 encoded audio data
   },
-  handler: async (ctx, args): Promise<TranscriptionResult> => {
+  handler: async (_ctx, args): Promise<TranscriptionResult> => {
     console.log("Starting transcription process...");
     console.log("Audio data length:", args.audioData.length);
 
