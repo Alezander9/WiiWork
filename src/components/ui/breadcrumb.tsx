@@ -39,13 +39,29 @@ BreadcrumbItem.displayName = "BreadcrumbItem";
 const BreadcrumbLink = React.forwardRef<
   HTMLAnchorElement,
   React.AnchorHTMLAttributes<HTMLAnchorElement> & Partial<AgentControlProps>
->(({ className, context, controlId, ...props }, ref) => (
-  <a
-    ref={ref}
-    className={cn("hover:text-foreground font-medium", className)}
-    {...props}
-  />
-));
+>(
+  (
+    { className, context, controlId, "data-hovered": hovered, ...props },
+    ref
+  ) => {
+    const hoverClasses = {
+      "!scale-110": hovered && className?.includes("hover:scale-110"),
+      // Add any other hover states we want to support
+    };
+
+    return (
+      <a
+        ref={ref}
+        className={cn(
+          "hover:text-foreground font-medium",
+          className,
+          hoverClasses
+        )}
+        {...props}
+      />
+    );
+  }
+);
 BreadcrumbLink.displayName = "BreadcrumbLink";
 
 const BreadcrumbSeparator = ({

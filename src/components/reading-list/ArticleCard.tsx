@@ -36,7 +36,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
       <AgentCardHeader>
         <AgentCardTitle
           controlId={`article-title-${article.id}`}
-          context="Click to open the article in a new tab"
+          context="Click to the title or share icon to open the article in a new tab"
           className="flex items-center justify-between"
         >
           <a

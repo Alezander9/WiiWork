@@ -35,7 +35,7 @@ export function BreadcrumbNav() {
         {/* Home is always first */}
         <AgentBreadcrumbItem controlId="breadcrumb-home">
           <AgentBreadcrumbLink
-            onClick={() => navigate("/")}
+            onUniversalClick={() => navigate("/")}
             controlId="breadcrumb-home"
             context="This link returns you to the WiiWork home page"
             className="font-bold text-wii-blue cursor-pointer transition-transform duration-200 hover:scale-110 inline-block"
@@ -51,7 +51,7 @@ export function BreadcrumbNav() {
               <AgentBreadcrumbSeparator className="text-wii-blue mx-2" />
               <AgentBreadcrumbItem controlId={`breadcrumb-${segment}`}>
                 <AgentBreadcrumbLink
-                  onClick={() => navigate(path)}
+                  onUniversalClick={() => navigate(path)}
                   controlId={`breadcrumb-${segment}`}
                   context={`This link takes you to the ${routeNames[segment]} page`}
                   className="font-bold text-wii-blue cursor-pointer transition-transform duration-200 hover:scale-110 inline-block"

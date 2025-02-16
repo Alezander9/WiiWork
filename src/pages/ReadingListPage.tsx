@@ -19,7 +19,7 @@ export default function ReadingListPage() {
     <>
       <AgentContext
         controlId="reading-list-context"
-        context="This is the reading list page where you can view and manage your saved articles. You can search articles, filter by status, and switch between grid and list views."
+        context="This is the reading list page where you can view and manage your saved articles. You can search articles, filter by status, and switch between grid and list views. You can also add a new article to your reading list by clicking the 'Add Article' button."
       />
 
       <div className="container mx-auto py-8 space-y-6">
