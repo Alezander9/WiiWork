@@ -51,11 +51,25 @@ export default function MobileInput() {
           sampleRate: 44100,
         },
       });
-      addDebugMessage("Microphone access granted");
 
-      // Use webm format consistently
-      const mimeType = "audio/webm";
-      addDebugMessage(`Using MIME type: ${mimeType}`);
+      // Check available MIME types
+      const supportedTypes = [
+        "audio/mp4",
+        "audio/aac",
+        "audio/mpeg",
+        "audio/mp3",
+        "audio/webm",
+      ].filter((type) => MediaRecorder.isTypeSupported(type));
+
+      addDebugMessage(`Supported types: ${supportedTypes.join(", ")}`);
+
+      // Choose the first supported type
+      const mimeType = supportedTypes[0];
+      if (!mimeType) {
+        throw new Error("No supported audio MIME types found");
+      }
+
+      addDebugMessage(`Selected MIME type: ${mimeType}`);
 
       const mediaRecorder = new MediaRecorder(stream, {
         mimeType,
