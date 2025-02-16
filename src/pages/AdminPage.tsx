@@ -2,10 +2,12 @@ import { AgentButton } from "@/components/agent-ui";
 import { AgentContext } from "@/components/agent-ui/AgentContext";
 import { useAgentStore } from "@/stores/agentStore";
 import { QRCodeSVG } from "qrcode.react";
+import { useNavigate } from "react-router-dom";
 
 export default function AdminPage() {
   const port = useAgentStore((state) => state.port);
   const generateNewPort = useAgentStore((state) => state.generateNewPort);
+  const navigate = useNavigate();
 
   const mobileInputUrl = port
     ? `${window.location.origin}/mobile-input/${port}`
@@ -19,6 +21,18 @@ export default function AdminPage() {
       />
 
       <div className="container mx-auto py-8 space-y-8">
+        {/* Back Button */}
+        <div className="max-w-md mx-auto">
+          <AgentButton
+            controlId="back-button"
+            onUniversalClick={() => navigate("/")}
+            context="This button returns you to the home page"
+            className="bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white font-normal"
+          >
+            Back
+          </AgentButton>
+        </div>
+
         <h1 className="text-4xl font-bold text-center mb-8 text-wii-blue">
           Admin Panel
         </h1>

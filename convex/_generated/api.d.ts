@@ -16,6 +16,7 @@ import type {
 import type * as llm from "../llm.js";
 import type * as mutations from "../mutations.js";
 import type * as queries from "../queries.js";
+import type * as whisper from "../whisper.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -29,6 +30,7 @@ declare const fullApi: ApiFromModules<{
   llm: typeof llm;
   mutations: typeof mutations;
   queries: typeof queries;
+  whisper: typeof whisper;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,
