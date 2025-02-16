@@ -21,6 +21,7 @@ export const internalTranscribeAudio = internalAction({
   handler: async (_ctx, args): Promise<TranscriptionResult> => {
     console.log("Starting transcription process...");
     console.log("Audio data length:", args.audioData.length);
+    console.log("MIME type:", args.mimeType);
 
     try {
       const whisperService = new WhisperService(process.env.OPENAI_API_KEY!);
@@ -37,11 +38,14 @@ export const internalTranscribeAudio = internalAction({
 
       console.log("Created audio buffer:", {
         size: audioBuffer.length,
-        type: "audio/webm",
+        type: args.mimeType,
       });
 
-      // Pass the buffer directly to the WhisperService
-      const transcript = await whisperService.transcribeAudio(audioBuffer);
+      // Pass both the buffer and MIME type to the WhisperService
+      const transcript = await whisperService.transcribeAudio(
+        audioBuffer,
+        args.mimeType
+      );
       console.log("Received transcript:", transcript);
 
       return {
