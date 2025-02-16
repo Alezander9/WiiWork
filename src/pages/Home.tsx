@@ -1,9 +1,8 @@
-import { AgentButton, AgentIconButton } from "@/components/agent-ui";
+import { AgentButton } from "@/components/agent-ui";
 import { useNavigate } from "react-router-dom";
-import { Settings } from "lucide-react";
 import { AgentContext } from "@/components/agent-ui/AgentContext";
 
-export default function WelcomePage() {
+export default function HomePage() {
   const navigate = useNavigate();
 
   return (
@@ -14,20 +13,6 @@ export default function WelcomePage() {
       />
 
       <div className="container mx-auto py-8 space-y-8">
-        {/* Add settings button */}
-        <div className="absolute top-4 right-4">
-          <AgentIconButton
-            controlId="settings-button"
-            onUniversalClick={() => {
-              console.log("Settings clicked!");
-            }}
-            context="This button opens the settings menu"
-            className="bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white"
-          >
-            <Settings className="w-6 h-6" />
-          </AgentIconButton>
-        </div>
-
         <h1 className="text-4xl font-bold text-center mb-8 text-wii-blue">
           WiiWork
         </h1>

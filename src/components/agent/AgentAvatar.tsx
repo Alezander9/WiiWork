@@ -7,7 +7,7 @@ export function AgentAvatar() {
   if (inputMode === "mobile") return null;
 
   return (
-    <div className="absolute bottom-24 right-12 z-0">
+    <div className="fixed bottom-24 right-12 z-0">
       <img
         src={avatarImage}
         alt="Agent Avatar"
