@@ -21,7 +21,11 @@ function Root() {
 
   const handleSendMessage = async (message: string) => {
     try {
-      await (window as any).__agentBrain.handleUserRequest(message);
+      const response = await (window as any).__agentBrain.handleUserRequest(
+        message
+      );
+      // We still need this for the UI
+      setAgentResponse(response);
     } catch (error) {
       console.error("Error sending message:", error);
       setAgentResponse(

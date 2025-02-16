@@ -576,12 +576,13 @@ export function AgentBrain() {
       // Add the actual interaction to chat history
       addUserMessage(inputMessage);
 
-      // Handle the response
-      handleResponse(response, addAssistantMessage).catch((error) => {
+      // Handle the response (this generates voice once)
+      await handleResponse(response, addAssistantMessage).catch((error) => {
         console.error("Error in response handling:", error);
         useAgentStore.getState().isResponding = false;
       });
 
+      // Return response for UI update
       return response;
     } catch (error) {
       console.error("Error handling user request:", error);
