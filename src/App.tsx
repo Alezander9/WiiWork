@@ -3,12 +3,16 @@ import HomePage from "./pages/Home";
 import ReadingListPage from "./pages/ReadingListPage";
 import AdminPage from "./pages/AdminPage";
 import MobileInput from "./pages/MobileInput";
+import DemoPage from "./pages/DemoPage";
 import { AgentIconButton } from "@/components/agent-ui";
 import { Settings, X } from "lucide-react";
 import { useState } from "react";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { AgentLabel } from "@/components/agent-ui/AgentLabel";
 import { AgentSwitch } from "@/components/agent-ui/AgentSwitch";
+import { useAgentStore } from "@/stores/agentStore";
+import { AgentButton } from "@/components/agent-ui/AgentButton";
+import { BreadcrumbNav } from "@/components/navigation/BreadcrumbNav";
 
 export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -72,18 +76,34 @@ export default function App() {
                 context="This toggle shows or hides the audio debug logs in the mobile input screen"
               />
             </div>
+
+            {/* Reset Agent State button */}
+            <div className="pt-4">
+              <AgentButton
+                controlId="reset-agent-state"
+                onUniversalClick={() =>
+                  useAgentStore.getState().setIsResponding(false)
+                }
+                context="This is an emergency button that resets the agent's responding state if it gets stuck."
+                className="w-full bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white font-normal"
+              >
+                Stop Agent Response
+              </AgentButton>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
       <BrowserRouter>
+        <BreadcrumbNav />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/reading-list" element={<ReadingListPage />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/mobile-input" element={<MobileInput />} />
           <Route path="/mobile-input/:port" element={<MobileInput />} />
+          <Route path="/demo" element={<DemoPage />} />
         </Routes>
       </BrowserRouter>
     </div>

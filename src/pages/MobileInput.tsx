@@ -7,7 +7,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useAction, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { AgentButton } from "@/components/agent-ui/AgentButton";
-
 export default function MobileInput() {
   const [message, setMessage] = useState("");
   const [port, setPort] = useState<string>("");
@@ -228,18 +227,6 @@ export default function MobileInput() {
       {/* Port Input Section */}
       {!port ? (
         <div className="flex-1 flex flex-col items-center justify-center p-4">
-          {/* Back Button */}
-          <div className="w-full max-w-sm mb-8">
-            <AgentButton
-              controlId="back-button"
-              onUniversalClick={() => navigate("/")}
-              context="This button returns you to the home page"
-              className="bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white font-normal"
-            >
-              Back
-            </AgentButton>
-          </div>
-
           <h1 className="text-2xl font-bold text-wii-blue mb-4">
             Enter Port Number
           </h1>
@@ -259,12 +246,14 @@ export default function MobileInput() {
               maxLength={6}
               pattern="\d{6}"
             />
-            <Button
+            <AgentButton
+              controlId="connect-button"
               type="submit"
               className="w-full bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white"
+              context="This button connects to the mobile input port"
             >
               Connect
-            </Button>
+            </AgentButton>
           </form>
         </div>
       ) : (

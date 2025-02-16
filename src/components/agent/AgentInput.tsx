@@ -73,7 +73,7 @@ export function AgentInput({ onSendMessage, agentResponse }: AgentInputProps) {
       {displayedText && (
         <div className="max-h-32 relative z-20">
           <div className="rounded-lg shadow-lg p-2">
-            <div className="text-lg text-gray-800 leading-relaxed whitespace-pre-line font-medium">
+            <div className="text-lg text-gray-800 leading-relaxed whitespace-pre-line font-medium mr-48">
               {displayedText}
             </div>
             <div ref={responseEndRef} />

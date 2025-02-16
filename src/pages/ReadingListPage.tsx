@@ -36,7 +36,6 @@ export default function ReadingListPage() {
       <div className="container mx-auto py-8 space-y-6">
         {/* Header */}
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-wii-blue">Reading List</h1>
           <AgentButton
             controlId="add-article-button"
             context="Click to add a new article to your reading list"

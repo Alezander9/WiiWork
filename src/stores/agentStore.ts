@@ -48,6 +48,7 @@ interface AgentState {
   generateNewPort: () => void;
   isResponding: boolean;
   lastResponseTime: number | null;
+  setIsResponding: (value: boolean) => void;
 }
 
 export const useAgentStore = create<AgentState>()((set, get) => ({
@@ -172,6 +173,8 @@ export const useAgentStore = create<AgentState>()((set, get) => ({
 
   isResponding: false,
   lastResponseTime: null,
+
+  setIsResponding: (value: boolean) => set({ isResponding: value }),
 
   setResponding: (isResponding: boolean) =>
     set((state) => ({

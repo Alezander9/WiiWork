@@ -31,3 +31,6 @@ export {
   AgentCardContent,
   AgentCardFooter,
 } from "./AgentCard";
+
+export { AgentLabel } from "./AgentLabel";
+export { AgentSwitch } from "./AgentSwitch";
