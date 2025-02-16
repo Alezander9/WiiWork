@@ -12,6 +12,7 @@ import { useAgentStore } from "@/stores/agentStore";
 export interface AgentControlProps {
   controlId: string;
   onUniversalClick?: () => void;
+  onUniversalInput?: (value: string) => void;
   context?: string;
   "data-hovered"?: boolean;
   className?: string;
@@ -24,7 +25,8 @@ export function withAgentControl<P extends Record<string, any>>(
   type CombinedProps = AgentControlProps & PropsWithChildren<P>;
 
   return forwardRef<any, CombinedProps>((props) => {
-    const { controlId, onUniversalClick, context, ...rest } = props;
+    const { controlId, onUniversalClick, onUniversalInput, context, ...rest } =
+      props;
     const elementRef = useRef<HTMLElement>(null);
 
     // Add state subscription
@@ -45,6 +47,7 @@ export function withAgentControl<P extends Record<string, any>>(
           elementRef as RefObject<HTMLElement>,
           {
             click: onUniversalClick,
+            input: onUniversalInput,
           },
           context
         );
@@ -56,7 +59,7 @@ export function withAgentControl<P extends Record<string, any>>(
           useAgentStore.getState().unregisterComponent(controlId);
         };
       }
-    }, [controlId, onUniversalClick, context]);
+    }, [controlId, onUniversalClick, onUniversalInput, context]);
 
     return (
       <WrappedComponent

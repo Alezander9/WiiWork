@@ -17,6 +17,7 @@ interface ComponentData {
   position: ComponentPosition | null;
   handlers: {
     click?: () => void;
+    input?: (value: string) => void;
   };
   ref: React.RefObject<HTMLElement>;
   context?: string;
@@ -29,7 +30,10 @@ interface AgentState {
   registerComponent: (
     id: string,
     ref: React.RefObject<HTMLElement>,
-    handlers: { click?: () => void },
+    handlers: {
+      click?: () => void;
+      input?: (value: string) => void;
+    },
     context?: string
   ) => void;
   unregisterComponent: (id: string) => void;
@@ -61,7 +65,10 @@ export const useAgentStore = create<AgentState>()((set, get) => ({
         [id]: {
           state: { isHovered: false, isPressed: false },
           position: null,
-          handlers,
+          handlers: {
+            click: handlers.click,
+            input: handlers.input,
+          },
           ref,
           context,
         },

@@ -12,6 +12,7 @@ export default function DemoPage() {
   const [iconButtonText, setIconButtonText] = useState("");
   const [inputText, setInputText] = useState("");
   const [switchText, setSwitchText] = useState("");
+  const [inputValue, setInputValue] = useState("");
 
   // Function to handle text fade
   const showTextWithFade = (
@@ -64,10 +65,16 @@ export default function DemoPage() {
           <AgentInput
             controlId="demo-test-input"
             placeholder="Type here..."
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
             onUniversalClick={() =>
               showTextWithFade(setInputText, "Input clicked")
             }
-            context="This is a test input field that displays text when clicked"
+            onUniversalInput={(value) => {
+              setInputValue(value);
+              showTextWithFade(setInputText, `Input set to: ${value}`);
+            }}
+            context="This is a test input field that can be clicked and typed into. Use [[input:demo-test-input:hello]] to type text"
             className="w-48"
           />
           <p className="text-wii-blue transition-opacity duration-500 h-6">

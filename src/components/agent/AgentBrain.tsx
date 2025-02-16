@@ -18,10 +18,15 @@ You will receive:
 Available Tools:
 - [[click:ELEMENT_ID]] : Clicks an element. The cursor will automatically move to the element and click after a brief pause.
 - [[hover:ELEMENT_ID]] : Moves the cursor over an element without clicking.
+- [[input:ELEMENT_ID:TEXT]] : Types text into an input element
 
 Example Tool Usage:
 "I'll help you navigate to the reading list.
 [[click:reading-list-button]]"
+
+Example Input Tool Usage:
+"I'll help you navigate to the reading list.
+[[input:reading-list-input:hello]]"
 
 Guidelines:
 1. Always explain what you're doing before using a tool
@@ -95,9 +100,11 @@ function formatPageState(cursor: any, components: Record<string, any>) {
   return output;
 }
 
+// Update ParsedToolCall interface to handle input parameters
 interface ParsedToolCall {
   action: string;
   target: string;
+  params?: string; // Add optional params
   fullMatch: string;
 }
 
@@ -106,13 +113,16 @@ function parseToolCalls(text: string): ParsedToolCall[] {
   let match;
 
   while ((match = TOOL_CALL_REGEX.exec(text)) !== null) {
+    const [action, targetAndParams] = [match[1], match[2]];
+    const parts = targetAndParams.split(":");
+
     calls.push({
-      action: match[1],
-      target: match[2],
+      action,
+      target: parts[0], // First part is always the target
+      params: parts[1], // Second part (if exists) is params
       fullMatch: match[0],
     });
   }
-
   return calls;
 }
 
@@ -244,6 +254,14 @@ async function executeToolCall(toolCall: ParsedToolCall) {
       // Wait for movement
       await sleep(500);
 
+      break;
+    }
+
+    case "input": {
+      const component = useAgentStore.getState().components[target];
+      if (component?.handlers.input && toolCall.params) {
+        component.handlers.input(toolCall.params);
+      }
       break;
     }
 
