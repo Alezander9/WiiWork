@@ -54,13 +54,11 @@ export default function MobileInput() {
       addDebugMessage("Microphone access granted");
 
       // Check supported MIME types for this browser
-      const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
-        ? "audio/webm;codecs=opus"
-        : MediaRecorder.isTypeSupported("audio/ogg;codecs=opus")
-          ? "audio/ogg;codecs=opus"
-          : MediaRecorder.isTypeSupported("audio/mp4")
-            ? "audio/mp4"
-            : "audio/wav";
+      const mimeType = MediaRecorder.isTypeSupported("audio/wav")
+        ? "audio/wav"
+        : MediaRecorder.isTypeSupported("audio/mp4")
+          ? "audio/mp4"
+          : "audio/webm"; // Fallback
 
       addDebugMessage(`Using MIME type: ${mimeType}`);
 

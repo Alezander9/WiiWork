@@ -21,12 +21,12 @@ export class WhisperService {
         // For server-side (Convex)
         formData.append(
           "file",
-          new Blob([audioData], { type: "audio/webm;codecs=opus" }),
-          "recording.webm"
+          new Blob([audioData], { type: "audio/wav" }),
+          "recording.wav"
         );
       } else {
         // For client-side (Browser)
-        formData.append("file", audioData as any, "recording.webm");
+        formData.append("file", audioData as any, "recording.wav");
       }
       formData.append("model", "whisper-1");
       formData.append("response_format", "text");
