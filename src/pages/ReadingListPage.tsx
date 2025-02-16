@@ -1,13 +1,5 @@
 import { AgentContext } from "@/components/agent-ui/AgentContext";
-import {
-  AgentButton,
-  AgentInput,
-  AgentSelect,
-  AgentSelectTrigger,
-  AgentSelectValue,
-  AgentSelectContent,
-  AgentSelectItem,
-} from "@/components/agent-ui";
+import { AgentButton, AgentInput } from "@/components/agent-ui";
 import { useReadingListStore } from "@/stores/readingListStore";
 import { ArticleCard } from "@/components/reading-list/ArticleCard";
 import { Grid, List, Plus, Search } from "lucide-react";
@@ -19,9 +11,6 @@ export default function ReadingListPage() {
     updateFilters,
     viewMode,
     toggleViewMode,
-    updateSort,
-    sortBy,
-    sortDirection,
   } = useReadingListStore();
 
   const articles = getFilteredArticles();
@@ -30,7 +19,7 @@ export default function ReadingListPage() {
     <>
       <AgentContext
         controlId="reading-list-context"
-        context="This is the reading list page where you can view and manage your saved articles. You can search, filter by tags or status, and sort the articles. Each article can be marked as read, archived, or removed."
+        context="This is the reading list page where you can view and manage your saved articles. You can search articles, filter by status, and switch between grid and list views."
       />
 
       <div className="container mx-auto py-8 space-y-6">
@@ -77,113 +66,55 @@ export default function ReadingListPage() {
             </AgentButton>
           </div>
 
-          {/* Status, Tags, and Sort */}
-          <div className="flex gap-4">
-            <AgentSelect
-              controlId="status-filter-select"
-              value={filters.status}
-              onValueChange={(value: typeof filters.status) =>
-                updateFilters({ status: value })
-              }
-            >
-              <AgentSelectTrigger
-                controlId="status-filter-trigger"
-                context="Select to filter articles by their read/archived status"
-                className="bg-wii-button-blue"
-              >
-                <AgentSelectValue
-                  controlId="status-filter-value"
-                  placeholder="Status"
-                />
-              </AgentSelectTrigger>
-              <AgentSelectContent controlId="status-filter-content">
-                <AgentSelectItem
-                  controlId="status-filter-all"
-                  value="all"
-                  context="Show all articles regardless of status"
-                >
-                  All
-                </AgentSelectItem>
-                <AgentSelectItem
-                  controlId="status-filter-unread"
-                  value="unread"
-                  context="Show only unread articles"
-                >
-                  Unread
-                </AgentSelectItem>
-                <AgentSelectItem
-                  controlId="status-filter-read"
-                  value="read"
-                  context="Show only read articles"
-                >
-                  Read
-                </AgentSelectItem>
-                <AgentSelectItem
-                  controlId="status-filter-archived"
-                  value="archived"
-                  context="Show only archived articles"
-                >
-                  Archived
-                </AgentSelectItem>
-              </AgentSelectContent>
-            </AgentSelect>
-
-            <AgentSelect
-              controlId="sort-select"
-              value={sortBy}
-              onValueChange={(value: typeof sortBy) =>
-                updateSort({ by: value, direction: sortDirection })
-              }
-            >
-              <AgentSelectTrigger
-                controlId="sort-trigger"
-                context="Select how to sort the articles"
-                className="bg-wii-button-blue"
-              >
-                <AgentSelectValue
-                  controlId="sort-value"
-                  placeholder="Sort by"
-                />
-              </AgentSelectTrigger>
-              <AgentSelectContent controlId="sort-content">
-                <AgentSelectItem
-                  controlId="sort-by-date"
-                  value="date"
-                  context="Sort articles by the date they were added"
-                >
-                  Date Added
-                </AgentSelectItem>
-                <AgentSelectItem
-                  controlId="sort-by-title"
-                  value="title"
-                  context="Sort articles alphabetically by title"
-                >
-                  Title
-                </AgentSelectItem>
-                <AgentSelectItem
-                  controlId="sort-by-status"
-                  value="status"
-                  context="Sort articles by their read status"
-                >
-                  Read Status
-                </AgentSelectItem>
-              </AgentSelectContent>
-            </AgentSelect>
-
+          {/* Filter Buttons */}
+          <div className="flex gap-2">
             <AgentButton
-              controlId="sort-direction"
-              onUniversalClick={() =>
-                updateSort({
-                  by: sortBy,
-                  direction: sortDirection === "asc" ? "desc" : "asc",
-                })
-              }
-              context={`Click to sort in ${
-                sortDirection === "asc" ? "descending" : "ascending"
-              } order`}
-              className="bg-wii-button-blue hover:bg-wii-blue text-black hover:text-white"
+              controlId="filter-all"
+              onUniversalClick={() => updateFilters({ status: "all" })}
+              context="Show all articles regardless of status"
+              className={`${
+                filters.status === "all"
+                  ? "bg-wii-blue text-white"
+                  : "bg-wii-button-blue"
+              }`}
             >
-              {sortDirection === "asc" ? "↑" : "↓"}
+              All
+            </AgentButton>
+            <AgentButton
+              controlId="filter-unread"
+              onUniversalClick={() => updateFilters({ status: "unread" })}
+              context="Show only unread articles"
+              className={`${
+                filters.status === "unread"
+                  ? "bg-wii-blue text-white"
+                  : "bg-wii-button-blue"
+              }`}
+            >
+              Unread
+            </AgentButton>
+            <AgentButton
+              controlId="filter-read"
+              onUniversalClick={() => updateFilters({ status: "read" })}
+              context="Show only read articles"
+              className={`${
+                filters.status === "read"
+                  ? "bg-wii-blue text-white"
+                  : "bg-wii-button-blue"
+              }`}
+            >
+              Read
+            </AgentButton>
+            <AgentButton
+              controlId="filter-archived"
+              onUniversalClick={() => updateFilters({ status: "archived" })}
+              context="Show only archived articles"
+              className={`${
+                filters.status === "archived"
+                  ? "bg-wii-blue text-white"
+                  : "bg-wii-button-blue"
+              }`}
+            >
+              Archived
             </AgentButton>
           </div>
         </div>

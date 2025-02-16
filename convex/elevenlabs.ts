@@ -15,14 +15,6 @@ async function streamToBuffer(stream: Readable): Promise<Buffer> {
   return Buffer.concat(chunks);
 }
 
-// Add interface for voice settings
-interface VoiceSettings {
-  stability: number;
-  similarity_boost: number;
-  style: number;
-  speaking_rate: number;
-}
-
 // Internal action that has access to API key
 export const internalGenerateVoice = internalAction({
   args: {
