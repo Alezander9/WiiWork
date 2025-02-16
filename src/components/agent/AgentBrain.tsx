@@ -363,6 +363,7 @@ export function AgentBrain() {
 
   // Update the generateVoiceResponse function
   async function generateVoiceResponse(text: string) {
+    console.log("=== Starting voice generation ===");
     let cleanText = text.replace(TOOL_CALL_REGEX, "").trim();
 
     // maximum 50 words
@@ -374,9 +375,7 @@ export function AgentBrain() {
     console.log("Generating voice for:", cleanText);
 
     try {
-      // Use the fast preset for quicker responses
-      const preset = VOICE_PRESETS.fast; // or .clear or .default
-
+      const preset = VOICE_PRESETS.fast;
       const result = await generateVoice({
         text: cleanText,
         voiceId: preset.voiceId,
@@ -385,6 +384,7 @@ export function AgentBrain() {
       });
 
       if (result.success && result.audioData) {
+        console.log("=== Voice generation successful ===");
         const audio = new Audio(`data:audio/mp3;base64,${result.audioData}`);
         await audio.play();
       } else {
