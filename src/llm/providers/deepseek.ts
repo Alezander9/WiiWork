@@ -17,7 +17,7 @@ export class DeepSeekProvider implements LLMProviderInterface {
   constructor(config: ProviderConfig) {
     this.client = new OpenAI({
       apiKey: config.apiKey,
-      baseURL: config.apiEndpoint || "https://api.deepseek.com",
+      baseURL: config.apiEndpoint || "https://integrate.api.nvidia.com/v1",
       dangerouslyAllowBrowser: false,
     });
   }
@@ -54,13 +54,14 @@ export class DeepSeekProvider implements LLMProviderInterface {
   ): Promise<LLMResponse> {
     try {
       const completion = await this.client.chat.completions.create({
-        model: "deepseek-chat",
+        model: "deepseek-ai/deepseek-r1",
         messages: messages.map((msg) => ({
           role: msg.role,
           content: msg.content,
         })),
         temperature: modelConfig.temperature ?? 1.0,
         max_tokens: modelConfig.maxTokens ?? 4096,
+        top_p: 0.7,
       });
 
       return {
@@ -84,13 +85,14 @@ export class DeepSeekProvider implements LLMProviderInterface {
   ): Promise<StreamingLLMResponse> {
     try {
       const stream = await this.client.chat.completions.create({
-        model: "deepseek-chat",
+        model: "deepseek-ai/deepseek-r1",
         messages: messages.map((msg) => ({
           role: msg.role,
           content: msg.content,
         })),
         temperature: modelConfig.temperature ?? 1.0,
         max_tokens: modelConfig.maxTokens ?? 4096,
+        top_p: 0.7,
         stream: true,
       });
 

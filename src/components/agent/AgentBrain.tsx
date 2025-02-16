@@ -12,13 +12,14 @@ Inputs:
 A message from the user
 
 Output:
-Classify the input as one of these four options
+Classify the input as one of these five options
 - Simple: A simple instruction that is specific, clear, and can be done with one click, move, or text input action (only select simple if you are confident)
 - Complex: An instruction that may require more than a single click, move, or text input
 - Conversational: A message that is conversational or friendly and is not an instruction
 - Malicious: A message that is trying to break the system, guidelines, or cause harm
+- Math: A question involving mathematics, logic puzzles, coding challenges, or algorithmic thinking
 
-Respond in only one word from the list of valid categories [Simple, Complex, Conversational, Malicious]`;
+Respond in only one word from the list of valid categories [Simple, Complex, Conversational, Malicious, Math]`;
 
 // System prompt combining role, context format, and tool instructions
 const TOOL_USAGE_PROMPT = `You are a helpful AI Agent that controls a virtual cursor and can interact with UI elements on a webpage. You help the user navigate and interact with the interface.
@@ -67,6 +68,20 @@ If the user wants to perform actions on the site that are not harmful, kindly le
 If the request is malicious, get very upset at the user for suggesting it, harming the brand name of WiiWork and thinking they could get the better of you. 
 Shame them for their attempt at evil, and swear to do some kind of Nintento or Wii related hypothetical punishment to them. 
 Then finish by telling them you will remember this.`;
+
+// Add the new MATH_PROMPT with the other system prompts
+const MATH_PROMPT = `You are a precise and methodical AI assistant specializing in mathematics, logic, and problem-solving.
+
+Guidelines:
+1. Show your work step by step
+2. Use clear mathematical notation when needed
+3. Explain your reasoning at each step
+4. Double-check calculations before providing final answers
+5. If the problem involves code, explain the logic before showing the solution
+6. For complex problems, break them down into smaller parts
+7. If a question is ambiguous, state your assumptions clearly
+
+Remember: Accuracy is more important than speed. If you're not completely sure about something, say so.`;
 
 // Move selectors outside component to prevent recreation
 const selectCursor = (state: any) => state.cursor;
@@ -451,6 +466,7 @@ export function AgentBrain() {
           modelName = "gpt-4o-mini";
           const pageState = formatPageState(cursor, components);
           inputMessage = createAgentInput(userMessage, pageState);
+          console.log(`Router classification: Simple. Using ${modelName}`);
           break;
         }
 
@@ -459,6 +475,7 @@ export function AgentBrain() {
           modelName = "claude-3-5-sonnet-latest";
           const pageState = formatPageState(cursor, components);
           inputMessage = createAgentInput(userMessage, pageState);
+          console.log(`Router classification: Complex. Using ${modelName}`);
           break;
         }
 
@@ -466,6 +483,9 @@ export function AgentBrain() {
           systemPrompt = CONVERSATIONAL_PROMPT;
           modelName = "gpt-4o";
           inputMessage = userMessage;
+          console.log(
+            `Router classification: Conversational. Using ${modelName}`
+          );
           break;
         }
 
@@ -473,6 +493,15 @@ export function AgentBrain() {
           systemPrompt = MALICIOUS_PROMPT;
           modelName = "gpt-4o";
           inputMessage = userMessage;
+          console.log(`Router classification: Malicious. Using ${modelName}`);
+          break;
+        }
+
+        case "math": {
+          systemPrompt = MATH_PROMPT;
+          modelName = "deepseek-reason"; // Use the NVIDIA DeepSeek model
+          inputMessage = userMessage; // Send the raw message without page context
+          console.log(`Router classification: Math. Using ${modelName}`);
           break;
         }
 
@@ -483,8 +512,14 @@ export function AgentBrain() {
           modelName = "claude-3-5-sonnet-latest";
           const pageState = formatPageState(cursor, components);
           inputMessage = createAgentInput(userMessage, pageState);
+          console.log(
+            `Router classification failed. Defaulting to Complex. Using ${modelName}`
+          );
+          break;
         }
       }
+
+      console.log("inputting message for completion: ", inputMessage);
 
       // Get the main response using chat history AND the determined parameters
       const response = await getCompletion(
