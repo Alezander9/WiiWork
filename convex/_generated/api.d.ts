@@ -13,6 +13,7 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as elevenlabs from "../elevenlabs.js";
 import type * as llm from "../llm.js";
 import type * as mutations from "../mutations.js";
 import type * as queries from "../queries.js";
@@ -27,6 +28,7 @@ import type * as whisper from "../whisper.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  elevenlabs: typeof elevenlabs;
   llm: typeof llm;
   mutations: typeof mutations;
   queries: typeof queries;

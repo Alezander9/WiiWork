@@ -135,6 +135,59 @@ interface ToolCallError extends Error {
 // Add sleep utility
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+// Add this near the top of the file
+const VOICE_PRESETS = {
+  default: {
+    voiceId: "TxGEqnHWrfWFTfGW9XjX", // Josh
+    settings: {
+      stability: 0.5,
+      similarity_boost: 0.75,
+      style: 0.0,
+      speaking_rate: 1.0,
+    },
+  },
+  fast: {
+    voiceId: "TxGEqnHWrfWFTfGW9XjX",
+    modelId: "eleven_turbo_v2",
+    settings: {
+      stability: 0.1,
+      similarity_boost: 0.5,
+      style: 0.0,
+      speaking_rate: 2.0,
+    },
+  },
+  clear: {
+    voiceId: "21m00Tcm4TlvDq8ikWAM", // Rachel
+    modelId: "eleven_multilingual_v2",
+    settings: {
+      stability: 0.8,
+      similarity_boost: 0.8,
+      style: 0.0,
+      speaking_rate: 0.9,
+    },
+  },
+  expressive: {
+    voiceId: "TxGEqnHWrfWFTfGW9XjX", // Josh
+    modelId: "eleven_multilingual_v2",
+    settings: {
+      stability: 0.3, // Lower stability for more variation
+      similarity_boost: 0.6, // Moderate voice matching
+      style: 0.8, // High expressiveness
+      speaking_rate: 1.1, // Slightly faster than normal
+    },
+  },
+  jamahal: {
+    voiceId: "bIHbv24MWmeRgasZH58o",
+    modelId: "eleven_flash_v2.5",
+    settings: {
+      stability: 0.3, // Can adjust these settings
+      similarity_boost: 0.6, // to get the voice character
+      style: 0.8, // you want
+      speaking_rate: 2.0,
+    },
+  },
+};
+
 // Add tool execution functions
 async function executeToolCall(toolCall: ParsedToolCall) {
   const { action, target } = toolCall;
@@ -204,6 +257,41 @@ async function executeToolCall(toolCall: ParsedToolCall) {
 
 export function AgentBrain() {
   const generateCompletion = useAction(api.llm.generateCompletion);
+  const generateVoice = useAction(api.elevenlabs.generateVoice);
+
+  // Update the generateVoiceResponse function
+  async function generateVoiceResponse(text: string) {
+    let cleanText = text.replace(TOOL_CALL_REGEX, "").trim();
+
+    // maximum 50 words
+    const maxLength = 50;
+    if (cleanText.split(" ").length > maxLength) {
+      cleanText = cleanText.slice(0, maxLength);
+    }
+
+    console.log("cleanText", cleanText);
+
+    try {
+      // Use the fast preset for quicker responses
+      const preset = VOICE_PRESETS.fast; // or .clear or .default
+
+      const result = await generateVoice({
+        text: cleanText,
+        voiceId: preset.voiceId,
+        modelId: preset.modelId,
+        settings: preset.settings,
+      });
+
+      if (result.success && result.audioData) {
+        const audio = new Audio(`data:audio/mp3;base64,${result.audioData}`);
+        await audio.play();
+      } else {
+        console.error("Voice generation failed:", result.error);
+      }
+    } catch (error) {
+      console.error("Error generating voice:", error);
+    }
+  }
 
   // Update initial system message
   const [chatHistory, setChatHistory] = useState<Message[]>([
@@ -245,13 +333,18 @@ export function AgentBrain() {
     }
   };
 
-  // Add this helper function
+  // Update the handleResponse function
   async function handleResponse(
     response: string,
     addAssistantMessage: (content: string) => void
   ) {
     // First, update the UI with the response
     addAssistantMessage(response);
+
+    // Generate voice in parallel with tool execution
+    generateVoiceResponse(response).catch((error) => {
+      console.error("Error generating voice:", error);
+    });
 
     try {
       const toolCalls = parseToolCalls(response);
