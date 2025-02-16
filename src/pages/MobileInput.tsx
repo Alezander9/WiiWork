@@ -63,6 +63,9 @@ export default function MobileInput() {
         MediaRecorder.isTypeSupported(type)
       );
 
+      // log supported types
+      console.log("Supported types:", MediaRecorder.isTypeSupported);
+
       if (!mimeType) {
         throw new Error("No supported audio MIME types found");
       }
