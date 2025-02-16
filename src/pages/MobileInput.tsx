@@ -38,7 +38,7 @@ export default function MobileInput() {
 
   // Helper function to add debug messages
   const addDebugMessage = (message: string) => {
-    setDebugMessages((prev) => [...prev.slice(-4), message]); // Keep last 5 messages
+    setDebugMessages((prev) => [...prev.slice(-10), message]);
   };
 
   const startRecording = async () => {
@@ -52,24 +52,22 @@ export default function MobileInput() {
         },
       });
 
-      // Check available MIME types
-      const supportedTypes = [
+      // Prioritize webm, then fallback to other formats
+      const preferredTypes = [
+        "audio/webm",
         "audio/mp4",
         "audio/aac",
         "audio/mpeg",
-        "audio/mp3",
-        "audio/webm",
-      ].filter((type) => MediaRecorder.isTypeSupported(type));
+      ];
+      const mimeType = preferredTypes.find((type) =>
+        MediaRecorder.isTypeSupported(type)
+      );
 
-      addDebugMessage(`Supported types: ${supportedTypes.join(", ")}`);
-
-      // Choose the first supported type
-      const mimeType = supportedTypes[0];
       if (!mimeType) {
         throw new Error("No supported audio MIME types found");
       }
 
-      addDebugMessage(`Selected MIME type: ${mimeType}`);
+      addDebugMessage(`Using MIME type: ${mimeType}`);
 
       const mediaRecorder = new MediaRecorder(stream, {
         mimeType,

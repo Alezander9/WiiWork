@@ -16,6 +16,7 @@ interface TranscriptionResult {
 export const internalTranscribeAudio = internalAction({
   args: {
     audioData: v.string(), // Base64 encoded audio data
+    mimeType: v.string(), // MIME type of the audio
   },
   handler: async (_ctx, args): Promise<TranscriptionResult> => {
     console.log("Starting transcription process...");
@@ -40,7 +41,10 @@ export const internalTranscribeAudio = internalAction({
       });
 
       // Pass the buffer directly to the WhisperService
-      const transcript = await whisperService.transcribeAudio(audioBuffer);
+      const transcript = await whisperService.transcribeAudio(
+        audioBuffer,
+        args.mimeType
+      );
       console.log("Received transcript:", transcript);
 
       return {
