@@ -110,7 +110,10 @@ export default function MobileInput() {
           addDebugMessage(`Converted to base64, length: ${base64Audio.length}`);
 
           // Call Convex action
-          const result = await transcribeAudio({ audioData: base64Audio });
+          const result = await transcribeAudio({
+            mimeType: mimeType,
+            audioData: base64Audio,
+          });
           console.log("Transcription result:", result);
 
           if (result.success && result.transcript.trim()) {
