@@ -360,9 +360,9 @@ export function AgentBrain() {
     addAssistantMessage(response);
 
     // Generate voice in parallel with tool execution
-    // generateVoiceResponse(response).catch((error) => {
-    //   console.error("Error generating voice:", error);
-    // });
+    generateVoiceResponse(response).catch((error) => {
+      console.error("Error generating voice:", error);
+    });
 
     try {
       const toolCalls = parseToolCalls(response);
