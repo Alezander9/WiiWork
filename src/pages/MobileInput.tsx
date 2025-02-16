@@ -53,15 +53,8 @@ export default function MobileInput() {
       });
       addDebugMessage("Microphone access granted");
 
-      // Check supported MIME types for this browser
-      const mimeType = MediaRecorder.isTypeSupported("audio/mpeg")
-        ? "audio/mpeg"
-        : MediaRecorder.isTypeSupported("audio/mp3")
-          ? "audio/mp3"
-          : MediaRecorder.isTypeSupported("audio/mp4")
-            ? "audio/mp4"
-            : "audio/webm"; // Last resort fallback
-
+      // Use webm format consistently
+      const mimeType = "audio/webm";
       addDebugMessage(`Using MIME type: ${mimeType}`);
 
       const mediaRecorder = new MediaRecorder(stream, {
@@ -69,15 +62,13 @@ export default function MobileInput() {
         audioBitsPerSecond: 128000,
       });
 
-      addDebugMessage(`Recorder state: ${mediaRecorder.state}`);
-
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
-      // Start recording immediately after permissions
-      mediaRecorder.start();
+      // Configure to collect data every second
+      mediaRecorder.start(1000); // Collect in 1-second chunks
       setIsRecording(true);
-      console.log("Recording started");
+      addDebugMessage("Recording started with 1-second chunks");
 
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
