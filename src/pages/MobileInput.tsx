@@ -50,7 +50,8 @@ export default function MobileInput() {
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
-          sampleRate: 44100,
+          sampleRate: 16000,
+          channelCount: 1,
         },
       });
 
@@ -95,16 +96,16 @@ export default function MobileInput() {
 
       const mediaRecorder = new MediaRecorder(stream, {
         mimeType,
-        audioBitsPerSecond: 128000,
+        audioBitsPerSecond: 32000,
       });
 
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
       // Configure to collect data every second
-      mediaRecorder.start(1000); // Collect in 1-second chunks
+      mediaRecorder.start(2000); // Collect in 2-second chunks
       setIsRecording(true);
-      addDebugMessage("Recording started with 1-second chunks");
+      addDebugMessage("Recording started with 2-second chunks");
 
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
