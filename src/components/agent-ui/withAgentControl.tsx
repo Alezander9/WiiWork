@@ -3,12 +3,13 @@ import {
   useRef,
   forwardRef,
   RefObject,
+  ComponentType,
   PropsWithChildren,
 } from "react";
 import { useAgentStore } from "@/stores/agentStore";
 
 // Props that the HOC needs
-interface AgentControlProps {
+export interface AgentControlProps {
   controlId: string;
   onUniversalClick?: () => void;
   context?: string;
@@ -16,10 +17,13 @@ interface AgentControlProps {
   className?: string;
 }
 
-export function withAgentControl<T extends AgentControlProps>(
-  WrappedComponent: React.ComponentType<PropsWithChildren<T>>
+// Use Record<string, any> to allow any additional props
+export function withAgentControl<P extends Record<string, any>>(
+  WrappedComponent: ComponentType<PropsWithChildren<P>>
 ) {
-  return forwardRef<HTMLElement, PropsWithChildren<T>>((props, _ref) => {
+  type CombinedProps = AgentControlProps & PropsWithChildren<P>;
+
+  return forwardRef<any, CombinedProps>((props) => {
     const { controlId, onUniversalClick, context, ...rest } = props;
     const elementRef = useRef<HTMLElement>(null);
 
@@ -59,7 +63,7 @@ export function withAgentControl<T extends AgentControlProps>(
         ref={elementRef}
         onClick={handleClick}
         data-hovered={componentState?.isHovered}
-        {...(rest as unknown as PropsWithChildren<T>)}
+        {...(rest as unknown as PropsWithChildren<P>)}
       />
     );
   });

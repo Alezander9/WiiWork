@@ -253,6 +253,8 @@ export function AgentBrain() {
     // Add user message to history
     addUserMessage(formattedInput);
 
+    console.log("formattedInput", formattedInput);
+
     try {
       const response = await getCompletion([
         ...chatHistory,
