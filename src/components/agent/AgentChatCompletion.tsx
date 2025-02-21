@@ -105,6 +105,9 @@ function determineRouteConfig({
       Please help the user by explaining what you'll do and using the available tools.`;
   };
 
+  console.log("routerResponse", routerResponse);
+  console.log("pageContextMessage", createPageContextMessage(userMessage));
+
   switch (routerResponse.trim().toLowerCase()) {
     case "simple":
       return {
