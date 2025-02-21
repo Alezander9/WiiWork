@@ -278,8 +278,12 @@ export default function MobileInput() {
 
           {/* Center Container - Modified */}
           <div className="flex-1 flex flex-col items-center justify-center">
-            {/* Mic Button and Status - Moved here */}
+            {/* Mic Button and Status */}
             <div className="flex flex-col items-center gap-4">
+              {/* Microphone status text */}
+              <div className="text-lg font-medium mb-2">
+                {isRecording ? "Microphone Recording" : "Microphone Muted"}
+              </div>
               <button
                 className={`w-32 h-32 rounded-full transition-colors flex items-center justify-center
                   ${

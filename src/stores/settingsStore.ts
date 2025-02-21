@@ -2,11 +2,15 @@ import { create } from "zustand";
 
 interface SettingsState {
   showAudioDebugLogs: boolean;
-  toggleAudioDebugLogs: () => void;
+  showStateDebugPanel: boolean;
+  setAudioDebugLogs: (value: boolean) => void;
+  setStateDebugPanel: (value: boolean) => void;
 }
 
 export const useSettingsStore = create<SettingsState>((set) => ({
   showAudioDebugLogs: false,
-  toggleAudioDebugLogs: () =>
-    set((state) => ({ showAudioDebugLogs: !state.showAudioDebugLogs })),
+  showStateDebugPanel: false,
+
+  setAudioDebugLogs: (value: boolean) => set({ showAudioDebugLogs: value }),
+  setStateDebugPanel: (value: boolean) => set({ showStateDebugPanel: value }),
 }));

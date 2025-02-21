@@ -4,10 +4,11 @@ import { Input } from "@/components/ui/input";
 import { useAgentStore } from "@/stores/agentStore";
 import avatarIdle from "@/assets/avatarIdle.png";
 import avatarTalking from "@/assets/avatarTalking.png";
+// import { useVoiceGenerator } from "./AgentVoice";
+// import { CircleStop } from "lucide-react";
 
-interface AgentInputProps {
+interface AgentChatBoxProps {
   onSendMessage: (message: string) => void;
-  agentResponse?: string;
 }
 
 // Helper to clean tool calls from response
@@ -20,12 +21,24 @@ function cleanResponse(response: string): string {
     .join("\n");
 }
 
-export function AgentInput({ onSendMessage, agentResponse }: AgentInputProps) {
+export function AgentChatBox({ onSendMessage }: AgentChatBoxProps) {
   const [message, setMessage] = useState("");
   const [displayedText, setDisplayedText] = useState("");
   const responseEndRef = useRef<HTMLDivElement>(null);
+
+  // Add agentResponse from store
+  const agentResponse = useAgentStore((state) => state.agentResponse.content);
+  const agentStatus = useAgentStore((state) => state.agentStatus);
+  const voice = useAgentStore((state) => state.voice);
   const inputMode = useAgentStore((state) => state.inputMode);
-  const isResponding = useAgentStore((state) => state.isResponding);
+  const setUserMessage = useAgentStore((state) => state.setUserMessage);
+
+  // Derive combined state for when input should be hidden
+  const isAgentBusy = agentStatus.isGenerating || agentStatus.isExecutingTools;
+
+  // Derive state for avatar talking animation
+  const isAgentTalking = voice.isPlaying;
+
   // Typewriter effect when agentResponse changes
   useEffect(() => {
     if (!agentResponse) return;
@@ -62,9 +75,27 @@ export function AgentInput({ onSendMessage, agentResponse }: AgentInputProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (message.trim()) {
+      // Update the user message in the store
+      setUserMessage(message.trim(), "text");
+      // Send the message
       onSendMessage(message.trim());
       setMessage("");
     }
+  };
+
+  // Helper to determine current status text
+  const getStatusText = () => {
+    if (agentStatus.isGenerating) return "thinking...";
+    // Only show voice gen when we have segments that are still generating
+    if (
+      voice.segments.some(
+        (seg) => seg.status === "generating" || seg.status === "pending"
+      )
+    ) {
+      return "voice gen...";
+    }
+    if (voice.isPlaying) return "speaking...";
+    return null;
   };
 
   return inputMode === "mobile" ? null : (
@@ -81,32 +112,38 @@ export function AgentInput({ onSendMessage, agentResponse }: AgentInputProps) {
         </div>
       )}
 
-      {/* Agent Avatar - Centered in the blurred background */}
+      {/* Agent Avatar Section */}
       <div className="absolute bottom-4 right-32 translate-x-1/2 w-56 h-56 z-10">
+        {/* Status Text */}
+        {getStatusText() && (
+          <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-gray-600 font-medium text-sm bg-white/80 px-3 py-1 rounded-full shadow-sm">
+            {getStatusText()}
+          </div>
+        )}
+
+        {/* Avatar images */}
         <div className="relative w-full h-full">
-          {/* Idle image */}
           <img
             src={avatarIdle}
             alt="Agent idle"
             className="absolute inset-0 w-full h-full object-contain transition-opacity duration-300"
             style={{
-              opacity: isResponding ? 0 : 1,
+              opacity: isAgentTalking ? 0 : 1,
             }}
           />
-          {/* Talking image */}
           <img
             src={avatarTalking}
             alt="Agent talking"
             className="absolute inset-0 w-full h-full object-contain transition-opacity duration-300"
             style={{
-              opacity: isResponding ? 1 : 0,
+              opacity: isAgentTalking ? 1 : 0,
             }}
           />
         </div>
       </div>
 
       {/* Input Form - Wii-style, overlaid on top */}
-      {!isResponding && (
+      {!isAgentBusy && (
         <div className="bg-white/80 backdrop-blur-sm border-t border-gray-200 shadow-lg relative z-30">
           <form
             onSubmit={handleSubmit}

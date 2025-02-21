@@ -3,13 +3,16 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { useAgentStore } from "@/stores/agentStore";
 
-interface AgentMobileInputProps {
+interface MobileInputListenerProps {
   onSendMessage: (message: string) => void;
 }
 
-export function AgentMobileInput({ onSendMessage }: AgentMobileInputProps) {
+export function MobileInputListener({
+  onSendMessage,
+}: MobileInputListenerProps) {
   const port = useAgentStore((state) => state.port);
   const generateNewPort = useAgentStore((state) => state.generateNewPort);
+  const setUserMessage = useAgentStore((state) => state.setUserMessage);
   const markMessageProcessed = useMutation(api.mutations.markMessageProcessed);
 
   // Keep track of processed message IDs
@@ -31,10 +34,8 @@ export function AgentMobileInput({ onSendMessage }: AgentMobileInputProps) {
 
     console.log("=== Processing Messages ===");
 
-    // Process messages in order
     const processMessages = async () => {
       for (const message of messages) {
-        // Skip if we've already processed this message
         if (processedMessages.current.has(message._id)) {
           console.log("Skipping already processed message:", message._id);
           continue;
@@ -43,24 +44,24 @@ export function AgentMobileInput({ onSendMessage }: AgentMobileInputProps) {
         try {
           console.log("Processing new message:", message._id);
 
-          // Mark as processed immediately to prevent duplicates
+          // Mark as processed immediately
           processedMessages.current.add(message._id);
-
-          // Mark as processed in DB before processing
           await markMessageProcessed({ messageId: message._id });
 
-          // Then forward message to agent
+          // Update store with the new message
+          setUserMessage(message.message, "voice");
+
+          // Forward message to agent
           await onSendMessage(message.message);
         } catch (error) {
           console.error("Error processing message:", error);
-          // Remove from processed set if failed
           processedMessages.current.delete(message._id);
         }
       }
     };
 
     processMessages();
-  }, [messages, onSendMessage, markMessageProcessed]);
+  }, [messages, onSendMessage, markMessageProcessed, setUserMessage]);
 
   // Component doesn't render anything
   return null;

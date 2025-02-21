@@ -23,6 +23,19 @@ interface ComponentData {
   context?: string;
 }
 
+interface VoiceSegment {
+  text: string;
+  audioData?: string;
+  status: "pending" | "generating" | "ready" | "failed";
+}
+
+interface VoiceState {
+  isPlaying: boolean;
+  segments: VoiceSegment[];
+  currentSegment: number;
+  error: string | null;
+}
+
 interface AgentState {
   components: {
     [id: string]: ComponentData;
@@ -53,6 +66,36 @@ interface AgentState {
   isResponding: boolean;
   lastResponseTime: number | null;
   setIsResponding: (value: boolean) => void;
+  userMessage: {
+    content: string | null;
+    timestamp: number | null;
+    source: "text" | "voice" | null;
+  };
+  setUserMessage: (content: string, source: "text" | "voice") => void;
+  agentStatus: {
+    isGenerating: boolean;
+    isExecutingTools: boolean;
+    isPlayingVoice: boolean;
+    currentToolCall: string | null;
+  };
+  setAgentGenerating: (isGenerating: boolean) => void;
+  setToolExecution: (isExecuting: boolean, currentTool?: string) => void;
+  voice: VoiceState;
+  setVoiceState: (updates: Partial<VoiceState>) => void;
+  updateVoiceSegment: (index: number, updates: Partial<VoiceSegment>) => void;
+  resetVoiceState: () => void;
+  mobileConnection: {
+    isConnected: boolean;
+    connectedDevices: number;
+    lastActivityTime: number | null;
+  };
+  agentResponse: {
+    content: string | null;
+    timestamp: number | null;
+    isComplete: boolean;
+  };
+  setAgentResponse: (content: string, isComplete: boolean) => void;
+  clearAgentResponse: () => void;
 }
 
 export const useAgentStore = create<AgentState>()((set, get) => ({
@@ -187,5 +230,123 @@ export const useAgentStore = create<AgentState>()((set, get) => ({
     set((state) => ({
       isResponding,
       lastResponseTime: isResponding ? state.lastResponseTime : Date.now(),
+    })),
+
+  userMessage: {
+    content: null,
+    timestamp: null,
+    source: null,
+  },
+
+  setUserMessage: (content: string, source: "text" | "voice") =>
+    set((state) => ({
+      userMessage: {
+        ...state.userMessage,
+        content,
+        timestamp: Date.now(),
+        source,
+      },
+    })),
+
+  agentStatus: {
+    isGenerating: false,
+    isExecutingTools: false,
+    isPlayingVoice: false,
+    currentToolCall: null,
+  },
+
+  setAgentGenerating: (isGenerating: boolean) =>
+    set((state) => ({
+      agentStatus: {
+        ...state.agentStatus,
+        isGenerating,
+      },
+    })),
+
+  setToolExecution: (isExecuting: boolean, currentTool?: string) =>
+    set((state) => ({
+      agentStatus: {
+        ...state.agentStatus,
+        isExecutingTools: isExecuting,
+        currentToolCall: currentTool || null,
+      },
+    })),
+
+  voice: {
+    isPlaying: false,
+    segments: [],
+    currentSegment: 0,
+    error: null,
+  },
+
+  setVoiceState: (updates) =>
+    set((state) => ({
+      voice: {
+        ...state.voice,
+        ...updates,
+      },
+    })),
+
+  updateVoiceSegment: (index, updates) =>
+    set((state) => ({
+      voice: {
+        ...state.voice,
+        segments: state.voice.segments.map((seg, i) =>
+          i === index ? { ...seg, ...updates } : seg
+        ),
+      },
+    })),
+
+  resetVoiceState: () =>
+    set((state) => ({
+      voice: {
+        ...state.voice,
+        isPlaying: false,
+        segments: [],
+        currentSegment: 0,
+        error: null,
+      },
+    })),
+
+  mobileConnection: {
+    isConnected: false,
+    connectedDevices: 0,
+    lastActivityTime: null,
+  },
+
+  updateMobileConnection: (deviceCount: number) =>
+    set((state) => ({
+      mobileConnection: {
+        ...state.mobileConnection,
+        isConnected: deviceCount > 0,
+        connectedDevices: deviceCount,
+        lastActivityTime: Date.now(),
+      },
+    })),
+
+  agentResponse: {
+    content: null,
+    timestamp: null,
+    isComplete: false,
+  },
+
+  setAgentResponse: (content: string, isComplete: boolean = true) =>
+    set((state) => ({
+      agentResponse: {
+        ...state.agentResponse,
+        content,
+        timestamp: Date.now(),
+        isComplete,
+      },
+    })),
+
+  clearAgentResponse: () =>
+    set((state) => ({
+      agentResponse: {
+        ...state.agentResponse,
+        content: null,
+        timestamp: null,
+        isComplete: false,
+      },
     })),
 }));
